@@ -1,0 +1,880 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>کارگاه زبان‌سازی — استیت‌های ۱ تا ۵</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+  :root{
+    --bg: #131f28;
+    --bg-panel: #1a2933;
+    --bg-panel-raised: #21333f;
+    --bg-input: #0f1922;
+    --ink: #ece3cf;
+    --ink-dim: #93a6ae;
+    --ink-faint: #62747c;
+    --gold: #d3a24c;
+    --gold-dim: #7c6535;
+    --teal: #6fada0;
+    --brick: #bd6249;
+    --line: #2a3c47;
+    --line-soft: #223038;
+    --font-main: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
+    --font-mono: "Vazirmatn", Tahoma, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);color:var(--ink);font-family:var(--font-main);
+    line-height:1.8;-webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:1180px;margin:0 auto;padding:0 0 80px;}
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:24px;
+    padding:20px 26px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:baseline;gap:12px;}
+  .brand-mark{font-size:28px;color:var(--gold);line-height:1;}
+  .brand h1{font-weight:700;font-size:20px;margin:0;color:var(--ink);}
+  .brand .sub{font-size:12.5px;color:var(--ink-faint);margin-top:3px;}
+  .progress-wrap{display:flex;align-items:center;gap:10px;min-width:220px;}
+  .progress-track{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));width:0%;transition:width .4s ease;}
+  #progressLabel{font-size:12px;color:var(--ink-dim);white-space:nowrap;}
+  .reset-btn{background:none;border:1px solid var(--line);color:var(--ink-faint);font-size:11.5px;padding:6px 10px;border-radius:5px;cursor:pointer;font-family:var(--font-main);}
+  .reset-btn:hover{color:var(--brick);border-color:var(--brick);}
+
+  .layout{display:flex;gap:0;align-items:flex-start;}
+  .rail{width:250px;flex:none;position:sticky;top:0;padding:18px 22px 40px 10px;border-inline-start:1px solid var(--line);max-height:100vh;overflow-y:auto;}
+  .rail-item{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:6px;cursor:pointer;color:var(--ink-dim);font-size:13.5px;margin-bottom:2px;transition:background .15s ease,color .15s ease;}
+  .rail-item:hover{background:var(--bg-panel);color:var(--ink);}
+  .rail-item.active{background:var(--bg-panel-raised);color:var(--gold);}
+  .rail-num{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;border:1px solid var(--line-soft);color:var(--ink-faint);}
+  .rail-item.active .rail-num{border-color:var(--gold);color:var(--gold);}
+  .rail-item.filled .rail-num{background:var(--gold-dim);color:var(--bg);border-color:var(--gold-dim);}
+  .rail-item.active.filled .rail-num{background:var(--gold);color:var(--bg);border-color:var(--gold);}
+  .rail-divider{height:1px;background:var(--line-soft);margin:10px 4px;}
+
+  .stage{flex:1;min-width:0;padding:30px 40px 40px;}
+  .section-head{margin-bottom:20px;}
+  .section-eyebrow{font-size:12px;color:var(--ink-faint);}
+  .section-title{font-size:24px;font-weight:700;margin:4px 0 0;color:var(--ink);}
+
+  .subnav{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:22px;}
+  .subnav-item{padding:6px 13px;border-radius:16px;border:1px solid var(--line);color:var(--ink-dim);font-size:12.5px;cursor:pointer;}
+  .subnav-item:hover{border-color:var(--gold-dim);color:var(--ink);}
+  .subnav-item.active{background:var(--gold-dim);border-color:var(--gold-dim);color:var(--bg);font-weight:600;}
+  .subnav-item.filled::after{content:" ●";font-size:8px;color:var(--gold);}
+
+  .guide{background:var(--bg-panel);border:1px solid var(--line);border-inline-start:3px solid var(--gold-dim);border-radius:4px;padding:14px 18px;margin-bottom:22px;font-size:14px;color:var(--ink-dim);}
+  .guide p{margin:0 0 8px;}
+  .guide p:last-child{margin-bottom:0;}
+  .guide .example{color:var(--teal);}
+  .guide strong{color:var(--ink);}
+
+  .card{background:var(--bg-panel);border:1px solid var(--line);border-radius:6px;padding:20px 22px;margin-bottom:18px;}
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:12.5px;color:var(--ink-dim);margin-bottom:6px;}
+  .field .hint{font-size:11.5px;color:var(--ink-faint);margin-top:5px;}
+  input[type=text], textarea{width:100%;background:var(--bg-input);border:1px solid var(--line);border-radius:5px;color:var(--ink);padding:9px 11px;font-family:var(--font-main);font-size:13.5px;resize:vertical;}
+  input[type=text]:focus, textarea:focus{outline:none;border-color:var(--gold-dim);}
+  textarea{min-height:56px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media (max-width:640px){.row2,.row3{grid-template-columns:1fr;}}
+
+  .toggle-group{display:flex;flex-wrap:wrap;gap:8px;}
+  .toggle-btn{background:var(--bg-input);border:1px solid var(--line);color:var(--ink-dim);padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;font-family:var(--font-main);transition:all .15s ease;}
+  .toggle-btn:hover{border-color:var(--gold-dim);color:var(--ink);}
+  .toggle-btn.active{background:var(--gold-dim);border-color:var(--gold-dim);color:var(--bg);font-weight:600;}
+  .toggle-btn.active.teal{background:var(--teal);border-color:var(--teal);}
+
+  .check-row{display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer;font-size:13.5px;color:var(--ink-dim);}
+  .check-row:last-child{margin-bottom:0;}
+  .check-box{width:17px;height:17px;border-radius:4px;border:1px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;background:var(--bg-input);font-size:11px;color:var(--bg);}
+  .check-box.active{background:var(--teal);border-color:var(--teal);}
+
+  .conditional{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);}
+
+  .wordgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px;}
+  @media (max-width:900px){.wordgrid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.wordgrid{grid-template-columns:1fr;}}
+  .word-row{background:var(--bg-input);border:1px solid var(--line);border-radius:6px;padding:9px 10px;}
+  .word-row .idx{font-size:10.5px;color:var(--ink-faint);margin-bottom:4px;}
+  .word-row input{margin-bottom:6px;}
+  .word-row input:last-child{margin-bottom:0;}
+
+  .table-rows{display:flex;flex-direction:column;gap:8px;}
+  .table-row{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;}
+  .table-row .idx{font-size:12px;color:var(--gold);text-align:center;}
+
+  .nav-buttons{display:flex;justify-content:space-between;margin-top:28px;}
+  .nav-btn{background:none;border:1px solid var(--line);color:var(--ink-dim);padding:10px 18px;border-radius:5px;cursor:pointer;font-size:13.5px;font-family:var(--font-main);}
+  .nav-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .nav-btn.primary{background:var(--gold-dim);border-color:var(--gold-dim);color:var(--bg);font-weight:600;}
+  .nav-btn.primary:hover{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+  .nav-btn:disabled{opacity:.3;cursor:default;}
+  .nav-btn:disabled:hover{border-color:var(--line);color:var(--ink-dim);}
+
+  .summary-card{background:var(--bg-panel);border:1px solid var(--gold-dim);border-radius:6px;padding:26px 30px;}
+  .summary-card h3{font-size:15px;color:var(--gold);margin:22px 0 8px;font-weight:700;padding-bottom:6px;border-bottom:1px solid var(--line-soft);}
+  .summary-card h3:first-child{margin-top:0;}
+  .summary-card p{margin:4px 0;font-size:14.5px;color:var(--ink);line-height:1.8;}
+  .summary-card .empty{color:var(--ink-faint);font-style:italic;}
+  .copy-btn{margin-top:18px;background:none;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:5px;cursor:pointer;font-size:13px;font-family:var(--font-main);}
+  .copy-btn:hover{background:var(--gold-dim);color:var(--bg);}
+
+  .guide ul{margin:8px 0 0;padding-inline-start:20px;}
+  .guide li{margin-bottom:8px;}
+  .reading{background:var(--bg-panel);border:1px solid var(--line);border-radius:6px;padding:20px 24px;margin-bottom:16px;}
+  .reading h4{margin:0 0 10px;font-size:16px;color:var(--gold);}
+  .reading p{margin:0 0 10px;font-size:14px;color:var(--ink-dim);line-height:1.85;}
+  .reading p:last-of-type{margin-bottom:0;}
+  .table-note{font-size:11.5px;color:var(--ink-faint);margin:12px 0 6px;}
+  .letter-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px;}
+  .letter-table th,.letter-table td{border:1px solid var(--line);padding:6px 10px;text-align:center;}
+  .letter-table th{background:var(--bg-panel-raised);color:var(--gold);font-weight:600;}
+  .letter-table td:first-child{direction:ltr;font-family:"Courier New",monospace;color:var(--teal);}
+  .example-card{background:var(--bg-panel);border:1px solid var(--line);border-radius:6px;padding:14px 18px;margin-bottom:12px;}
+  .example-card .lang{color:var(--gold);font-weight:700;font-size:14px;margin-bottom:6px;}
+  .example-card p{margin:4px 0;font-size:13.5px;color:var(--ink-dim);line-height:1.75;}
+  .example-card .forms{direction:ltr;text-align:left;color:var(--teal);font-family:"Courier New",monospace;font-size:13px;margin-top:6px;}
+
+  .mobile-tabs{display:none;}
+  @media (max-width:860px){
+    .rail{display:none;}
+    .mobile-tabs{display:flex;overflow-x:auto;gap:6px;padding:14px 16px;border-bottom:1px solid var(--line);}
+    .mobile-tab{flex:none;padding:7px 13px;border-radius:16px;border:1px solid var(--line);color:var(--ink-dim);font-size:12.5px;white-space:nowrap;cursor:pointer;}
+    .mobile-tab.active{background:var(--gold-dim);color:var(--bg);border-color:var(--gold-dim);}
+    .stage{padding:22px 18px 40px;}
+  }
+  .saved-flag{position:fixed;bottom:18px;left:22px;background:var(--bg-panel-raised);border:1px solid var(--gold-dim);color:var(--gold);font-size:12px;padding:8px 14px;border-radius:5px;opacity:0;transition:opacity .3s ease;pointer-events:none;}
+  .saved-flag.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <span class="brand-mark">§</span>
+      <div>
+        <h1>کارگاه زبان‌سازی</h1>
+        <div class="sub">استیت ۱ تا ۵ + دو ایدهٔ فرهنگی: سیستم شمارش و تقویم</div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span id="progressLabel">۰٪</span>
+      <button class="reset-btn" id="resetBtn">پاک‌سازی همه</button>
+    </div>
+  </div>
+
+  <div class="mobile-tabs" id="mobileTabs"></div>
+
+  <div class="layout">
+    <nav class="rail" id="rail"></nav>
+    <main class="stage" id="stage"></main>
+  </div>
+</div>
+<div class="saved-flag" id="savedFlag">ذخیره شد</div>
+
+<script>
+(function(){
+
+  const STORAGE_KEY = 'language-workshop-fa:v1';
+
+  const TOP = [
+    {id:'state1', num:'۱', label:'دنیای زبان'},
+    {id:'appendix1', num:'پ', label:'پیوست ۱ — خط‌های باستانی ایران'},
+    {id:'state2', num:'۲', label:'الفبا'},
+    {id:'state3', num:'۳', label:'کلمات اصلی'},
+    {id:'appendix2', num:'پ', label:'پیوست ۲ — کلمه‌ها چطور تغییر می‌کنند'},
+    {id:'state4', num:'۴', label:'ساخت کلمات'},
+    {id:'state5', num:'۵', label:'ساختار جمله (گرامر)'},
+    {id:'counting', num:'★', label:'ایده: سیستم شمارش'},
+    {id:'calendar', num:'★', label:'ایده: تقویم'},
+    {id:'summary', num:'✓', label:'خلاصهٔ نهایی'}
+  ];
+
+  const GRAMMAR_SUB = [
+    {id:'structure', label:'ترتیب جمله'},
+    {id:'time', label:'زمان'},
+    {id:'number', label:'مفرد/جمع'},
+    {id:'gender', label:'جنسیت'},
+    {id:'agreement', label:'مطابقت'},
+    {id:'negation', label:'منفی‌سازی'},
+    {id:'questions', label:'پرسشی‌سازی'},
+    {id:'omission', label:'حذف اجزا'},
+    {id:'test', label:'جمله‌های آزمایشی'},
+    {id:'challenge', label:'چالش نهایی'}
+  ];
+
+  const FLOW = [
+    {top:'state1'}, {top:'appendix1'}, {top:'state2'}, {top:'state3'}, {top:'appendix2'}, {top:'state4'},
+    ...GRAMMAR_SUB.map(g=>({top:'state5', sub:g.id})),
+    {top:'counting'}, {top:'calendar'}, {top:'summary'}
+  ];
+
+  function emptyWords(n){ return Array.from({length:n}, ()=>({concept:'', word:''})); }
+  function emptyOps(n){ return Array.from({length:n}, ()=>({problem:'', answer:''})); }
+
+  function defaultState(){
+    return {
+      state1:{beings:'', place:'', beliefs:''},
+      state2:{alphabetChoice:'', removed:'', added:''},
+      state3:{words: emptyWords(15)},
+      state4:{method:'', timeShow:'', numberShow:'', genderHas:'', genderExplain:'', baseWord:'', pluralForm:'', negForm:'', pastForm:''},
+      counting:{
+        noNumberMethod:'', baseChoice:'', customBase:'', symbols: Array(10).fill(''),
+        positional:'', positionalExplain:'', hasZero:'', zeroSymbol:'', zeroExplain:'',
+        opsChoice:'', opsExamples: emptyOps(3), sysName:'', sysNameWhy:''
+      },
+      state5:{
+        structure:{order:'', customOrder:'', why:'', changes:'', changeExample:'', markingMethod:''},
+        time:{sys:[], customSys:'', verb:'', present:'', past:'', future:'', method:'', methodExplain:''},
+        number:{has:'', singNoun:'', pluralNoun:'', verbChanges:false, adjChanges:false, pronounChanges:false, sentSing:'', sentPlur:'', why:''},
+        gender:{has:'', nouns:false, pronouns:false, adjectives:false, verbs:false, heForm:'', sheForm:'', theyForm:''},
+        agreement:{nounAdj:'', nounAdjEx:'', subjVerb:'', subjVerbEx:'', pronounNoun:'', pronounNounEx:''},
+        negation:{method:'', explain:'', positive:'', negative:''},
+        questions:{method:'', explain:'', statement:'', question:''},
+        omission:{subject:'', object:'', time:'', explain:''},
+        test:{simple:'',simpleFa:'',tense:'',tenseFa:'',plural:'',pluralFa:'',negative:'',negativeFa:'',question:'',questionFa:'',newRule:''},
+        challenge:{mystery:'', missing:'', ambiguity:''}
+      },
+      calendar:{
+        dayDef:'', monthDef:'', yearDef:'', inspiration:'',
+        yearLength:'', monthsCount:'', extraDaysHandling:'',
+        cultureFocus:'', monthNamingBasis:'', monthNames:'', festivals:'', yearStart:''
+      }
+    };
+  }
+
+  let STATE = defaultState();
+  let flowIndex = 0;
+  let saveTimer = null;
+
+  function escapeHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function getPath(o,p){ return p.split('.').reduce((a,k)=>(a==null?a:a[k]),o); }
+  function setPath(o,p,v){ const k=p.split('.'); let a=o; for(let i=0;i<k.length-1;i++)a=a[k[i]]; a[k[k.length-1]]=v; }
+  function adjustLen(arr,len,fill){ while(arr.length<len)arr.push(fill); while(arr.length>len)arr.pop(); }
+
+  function flashSaved(){
+    const el = document.getElementById('savedFlag');
+    el.classList.add('show'); clearTimeout(el._t);
+    el._t = setTimeout(()=>el.classList.remove('show'), 900);
+  }
+  async function save(){
+    try{ const res = await window.storage.set(STORAGE_KEY, JSON.stringify(STATE), false); if(res) flashSaved(); }
+    catch(e){ console.error('save failed', e); }
+  }
+  function saveDebounced(){ clearTimeout(saveTimer); saveTimer=setTimeout(save,500); }
+  async function load(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, false);
+      if(res && res.value){
+        const parsed = JSON.parse(res.value);
+        const def = defaultState();
+        Object.keys(def).forEach(k=>{
+          if(parsed[k]===undefined) return;
+          if(k==='state5'){
+            Object.keys(def.state5).forEach(sk=>{ def.state5[sk] = Object.assign(def.state5[sk], parsed.state5 && parsed.state5[sk] || {}); });
+          } else if(k==='state3'){
+            def.state3.words = (parsed.state3 && parsed.state3.words) ? parsed.state3.words : def.state3.words;
+          } else if(k==='counting'){
+            def.counting = Object.assign(def.counting, parsed.counting||{});
+          } else {
+            def[k] = Object.assign(def[k], parsed[k]);
+          }
+        });
+        STATE = def;
+      }
+    }catch(e){ /* هیچ داده‌ای ذخیره نشده */ }
+  }
+
+  /* ---------- کامپوننت‌های عمومی ---------- */
+  function fieldText(path,label,placeholder,hint,extraAttr){
+    const v = getPath(STATE,path)||'';
+    return `<div class="field"><label>${escapeHtml(label)}</label>
+      <input type="text" data-field="${path}" ${extraAttr||''} value="${escapeHtml(v)}" placeholder="${escapeHtml(placeholder||'')}">
+      ${hint?`<div class="hint">${hint}</div>`:''}</div>`;
+  }
+  function fieldArea(path,label,placeholder,hint){
+    const v = getPath(STATE,path)||'';
+    return `<div class="field"><label>${escapeHtml(label)}</label>
+      <textarea data-field="${path}" placeholder="${escapeHtml(placeholder||'')}">${escapeHtml(v)}</textarea>
+      ${hint?`<div class="hint">${hint}</div>`:''}</div>`;
+  }
+  function toggleGroup(path,label,options){
+    const v = getPath(STATE,path)||'';
+    return `<div class="field"><label>${escapeHtml(label)}</label><div class="toggle-group">
+      ${options.map(o=>`<button type="button" class="toggle-btn ${v===o.value?'active':''}" data-toggle="${path}" data-value="${escapeHtml(o.value)}">${escapeHtml(o.text)}</button>`).join('')}
+    </div></div>`;
+  }
+  function checkRow(path,label){
+    const v = !!getPath(STATE,path);
+    return `<div class="check-row" data-check="${path}"><span class="check-box ${v?'active':''}">${v?'✓':''}</span><span>${escapeHtml(label)}</span></div>`;
+  }
+
+  /* ---------- استیت ۱ ---------- */
+  function renderState1(){
+    return `
+      <div class="guide">
+        <p>پیش از ساختن هر کلمه یا قاعده‌ای، باید بدانید این زبان برای چه کسانی و در چه دنیایی ساخته می‌شود. جهانی که برای گویشوران‌تان می‌سازید، مستقیماً روی دایرهٔ لغات و حتی گرامر بعدی‌تان اثر می‌گذارد.</p>
+      </div>
+      <div class="card">
+        ${fieldArea('state1.beings','گویشوران زبان شما چه موجوداتی هستند؟','مثلاً: انسان، فرازمینی، حیوانی هوشمند، روح یا هر موجود دیگری')}
+        ${fieldArea('state1.place','کجا و در چه زمانی زندگی می‌کنند؟','مثال: موجوداتی که روی دریا زندگی می‌کنند احتمالاً دایرهٔ لغات پر از کلمات دریا و ماهی دارند؛ یا انسان‌هایی در دورانی باستانی')}
+        ${fieldArea('state1.beliefs','باورها و آرمان‌های گویشوران‌تان چیست؟','مثال: صداقت می‌تواند ارزشی محوری باشد، یا زبانی پر از اسطوره‌های داستانی')}
+      </div>`;
+  }
+
+  /* ---------- استیت ۲ ---------- */
+  function renderState2(){
+    return `
+      <div class="guide">
+        <p>اولین قدمِ عملیِ ساخت زبان، انتخاب مجموعه‌حروفی است که کلمات‌تان با آن نوشته می‌شوند. اگر پیوستِ مجموعه‌حروف را در اختیار دارید، یکی را انتخاب کنید؛ در غیر این صورت می‌توانید مجموعهٔ حروف دلخواه خودتان را توصیف کنید.</p>
+      </div>
+      <div class="card">
+        ${fieldArea('state2.alphabetChoice','کدام مجموعه‌حروف را انتخاب کردید؟ (یا آن را توصیف کنید)','مثلاً: مجموعهٔ حروف شمارهٔ ۲ از پیوست، یا شرح مجموعهٔ حروف دلخواه خودتان')}
+        ${fieldArea('state2.removed','کدام ۳ حرف را حذف یا تغییر دادید؟ چرا؟')}
+        ${fieldArea('state2.added','یک حرف یا نماد کاملاً جدید اضافه کنید؛ معنایش چیست و چرا اضافه‌اش کردید؟')}
+      </div>`;
+  }
+
+  /* ---------- استیت ۳ ---------- */
+  function renderState3(){
+    const words = STATE.state3.words;
+    const placeholders = ['آب','آتش','خانه','مادر','خورشید','چشم','دست','رفتن','خوردن','بزرگ','کوچک','من','تو','یک','دو'];
+    const rows = words.map((w,i)=>`
+      <div class="word-row">
+        <div class="idx">مفهوم ${i+1}</div>
+        <input type="text" data-field="state3.words.${i}.concept" value="${escapeHtml(w.concept)}" placeholder="مفهوم (فارسی) — مثلاً ${placeholders[i]||''}">
+        <input type="text" data-field="state3.words.${i}.word" value="${escapeHtml(w.word)}" placeholder="کلمهٔ زبان شما">
+      </div>`).join('');
+    return `
+      <div class="guide">
+        <p>بر اساس فرهنگی که در استیت ۱ ساختید و با حروفی که در استیت ۲ انتخاب کردید، ۱۵ کلمهٔ اولیه و ضروری بسازید. این کلمات هستهٔ اصلی دایرهٔ لغات شما هستند و بعداً برای ساختن کلمات دیگر از آن‌ها استفاده می‌کنید — پس معنایشان باید روشن و ضروری باشد.</p>
+      </div>
+      <div class="card"><div class="wordgrid">${rows}</div></div>`;
+  }
+
+  /* ---------- استیت ۴ ---------- */
+  function renderState4(){
+    return `
+      <div class="guide">
+        <p>حالا باید تصمیم بگیرید کلمات جدید در زبان‌تان چگونه ساخته می‌شوند — بدون این‌که هر مفهوم نمادی کاملاً جدا داشته باشد. آیا زمان، تعداد یا جنسیت باعث تغییر شکل کلمه می‌شوند؟ آیا از پیشوند، پسوند یا روش دیگری استفاده می‌کنید؟</p>
+      </div>
+      <div class="card">
+        ${toggleGroup('state4.method','روش کلی ساخت/تغییر کلمات چیست؟', [
+          {value:'prefix',text:'پیشوند'},{value:'suffix',text:'پسوند'},
+          {value:'infix',text:'میان‌وند'},{value:'root',text:'تغییر وزن/ریشهٔ کلمه'},
+          {value:'reduplication',text:'تکرار بخشی از کلمه'},{value:'word',text:'افزودن یک کلمهٔ جداگانه'},
+          {value:'other',text:'روش دیگر'}
+        ])}
+        ${fieldArea('state4.timeShow','زمان (گذشته/حال/آینده) چطور در ساخت کلمه ظاهر می‌شود؟')}
+        ${fieldArea('state4.numberShow','تعداد (جمع بستن) چطور در ساخت کلمه ظاهر می‌شود؟')}
+        ${toggleGroup('state4.genderHas','آیا جنسیت در ساخت کلمات تأثیر دارد؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر'}])}
+        ${STATE.state4.genderHas==='yes'?`<div class="conditional">${fieldArea('state4.genderExplain','توضیح دهید جنسیت چطور کلمه را تغییر می‌دهد')}</div>`:''}
+        <div class="conditional">
+          <label style="display:block;font-size:12.5px;color:var(--ink-dim);margin-bottom:10px;">یک کلمهٔ پایه انتخاب کنید و شکل‌های مختلفش را بنویسید</label>
+          <div class="row3">
+            ${fieldText('state4.baseWord','کلمهٔ پایه')}
+            ${fieldText('state4.pluralForm','شکل جمع')}
+            ${fieldText('state4.negForm','شکل منفی')}
+          </div>
+          <div style="margin-top:14px;">${fieldText('state4.pastForm','شکل زمان گذشته')}</div>
+        </div>
+      </div>`;
+  }
+
+  /* ---------- ایده: سیستم شمارش ---------- */
+  function countingBaseNumber(){
+    const c = STATE.counting;
+    if(c.baseChoice==='other'){ const n=parseInt(c.customBase,10); return (n>=2&&n<=24)?n:10; }
+    if(c.baseChoice){ return parseInt(c.baseChoice,10); }
+    return 10;
+  }
+  function renderCounting(){
+    const base = countingBaseNumber();
+    adjustLen(STATE.counting.symbols, base, '');
+    const symbolRows = STATE.counting.symbols.map((s,i)=>`
+      <div class="table-row"><div class="idx">${i+1}</div>
+        <input type="text" data-field="counting.symbols.${i}" value="${escapeHtml(s)}" placeholder="نماد برای مقدار ${i+1}"></div>`).join('');
+    const opsRows = STATE.counting.opsExamples.map((o,i)=>`
+      <div class="row2" style="margin-bottom:10px;">
+        <input type="text" data-field="counting.opsExamples.${i}.problem" value="${escapeHtml(o.problem)}" placeholder="مسئله ${i+1} — مثلاً ۴ + ۳ به نمادهای خودتان">
+        <input type="text" data-field="counting.opsExamples.${i}.answer" value="${escapeHtml(o.answer)}" placeholder="پاسخ با سیستم خودتان">
+      </div>`).join('');
+    return `
+      <div class="guide">
+        <p>این یک فعالیت فرهنگی جانبی است: پیش از آن‌که سراغ گرامر کامل بروید، تصمیم بگیرید تمدنِ گویشوران شما اصلاً چطور می‌شمارد. نتیجهٔ این بخش می‌تواند مستقیماً روی نحوهٔ ساخت کلمات عددی در استیت ۴ اثر بگذارد.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۱. اصلاً عدد نداریم</div>
+        ${fieldArea('counting.noNumberMethod','فرض کنید هنوز نماد عددی اختراع نشده. چند دسته از چیزها (مثلاً سنگ) با تعداد متفاوت پیش رو دارید؛ استفاده از اعداد ۱،۲،۳... ممنوع است. چطور مقدار هر دسته را ثبت می‌کنید؟ از کجا می‌فهمید کدام دسته بیشتر است؟','مثال: با کشیدن یک خط برای هر واحد، یا چیدن سنگ‌ها در ردیف و مقایسهٔ طول ردیف‌ها','با اعدادی نسبتاً بزرگ (مثلاً ۲۰۰ یا ۳۰۰) امتحان کنید تا ببینید این روش چقدر سخت می‌شود.')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۲. ساخت مبنا</div>
+        <div class="guide" style="margin-bottom:14px;">
+          <p>برای این‌که مجبور نباشید برای هر عدد یک نماد کاملاً جدا بسازید، اعداد را دسته‌بندی می‌کنید — مثلاً هر ۵ تا یا هر ۲۰ تا یک گروه. این عدد دسته‌بندی، «مبنا»ی سیستم شماست.</p>
+        </div>
+        ${toggleGroup('counting.baseChoice','مبنای سیستم شمارش‌تان را انتخاب کنید', [
+          {value:'5',text:'۵'},{value:'10',text:'۱۰'},{value:'20',text:'۲۰'},{value:'other',text:'مبنای دیگر'}
+        ])}
+        ${STATE.counting.baseChoice==='other'?`<div class="conditional">${fieldText('counting.customBase','مبنای دلخواه (یک عدد بین ۲ تا ۲۴)','مثلاً ۱۲ یا ۶۰','', 'data-resize="true"')}</div>`:''}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۳. جدول اعداد و نماد</div>
+        <div class="guide" style="margin-bottom:14px;"><p>بر اساس مبنایی که انتخاب کردید، برای مقادیر ۱ تا ${base} یک نماد بسازید. بقیهٔ اعداد بعداً از ترکیب همین نمادها ساخته می‌شوند.</p></div>
+        <div class="table-rows">${symbolRows}</div>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۴. ارزش مکانی</div>
+        ${toggleGroup('counting.positional','آیا تکرار یک نماد، بسته به جایگاهش، معنای متفاوتی دارد؟', [
+          {value:'yes',text:'بله — سیستم ارزش مکانی دارم'},
+          {value:'no',text:'خیر — نمادها فقط جمع می‌شوند (سیستم افزایشی)'}
+        ])}
+        ${fieldArea('counting.positionalExplain','قانونش را توضیح دهید','مثال: اگر نماد عدد یک ☆ باشد، آیا ☆☆ یعنی «دو» یا یعنی «یازده»؟ کدام را انتخاب کردید و چرا؟')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۵. عدد صفر</div>
+        ${toggleGroup('counting.hasZero','آیا سیستم شما نماد مستقلی برای صفر دارد؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر — فعلاً صفر ندارم'}])}
+        ${STATE.counting.hasZero==='yes'
+          ? `<div class="conditional">${fieldText('counting.zeroSymbol','نماد صفر چیست؟')}</div>`
+          : `<div class="conditional">${fieldArea('counting.zeroExplain','بدون نماد صفر، چطور نبودِ مقدار را نشان می‌دهید؟','مثال: انبار شما از یک کالا هیچ موجودی ندارد؛ یا باید عدد ۲۱۰ سرباز را در نامه‌ای به پادشاه بنویسید — چطور می‌نویسید؟')}</div>`}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۶. عملیات</div>
+        ${toggleGroup('counting.opsChoice','چه عملیاتی در سیستم شما تعریف می‌شود؟', [
+          {value:'addsub',text:'فقط جمع و تفریق'},{value:'all4',text:'هر چهار عمل اصلی'}
+        ])}
+        <div class="conditional">
+          <label style="display:block;font-size:12.5px;color:var(--ink-dim);margin-bottom:10px;">چند مسئله با نمادهای خودتان حل کنید</label>
+          ${opsRows}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۷. اسم سیستم</div>
+        ${fieldText('counting.sysName','بر اساس فرهنگ تمدن‌تان، اسمی برای این سیستم شمارش انتخاب کنید','مثال: اگر نجوم مهم است، «سیستم خورشیدی»؛ اگر دزدان دریایی‌اند، «سیستم اسکلتی»')}
+        ${fieldArea('counting.sysNameWhy','چرا این اسم را انتخاب کردید؟')}
+      </div>`;
+  }
+
+  /* ---------- استیت ۵: گرامر ---------- */
+  function renderS5Structure(){
+    const s = STATE.state5.structure;
+    return `
+      <div class="guide"><p>سه کلمه به معنای «یک موجود + یک چیز + یک عمل» انتخاب کنید — مثلاً <span class="example">گربه · ماهی · خوردن</span> — و آن‌ها را به ترتیب‌های مختلف بچینید. اگر ترتیب باعث تغییر معنا شود، یعنی زبان شما به «ترتیب کلمات» برای رساندن معنا تکیه دارد؛ اگر نه، باید چیز دیگری (پسوند، نشانه، خود فعل) این نقش را ایفا کند.</p></div>
+      <div class="card">
+        ${toggleGroup('state5.structure.order','ترتیب پیش‌فرض جمله چیست؟', [
+          {value:'SOV',text:'فاعل–مفعول–فعل'},{value:'SVO',text:'فاعل–فعل–مفعول'},
+          {value:'OSV',text:'مفعول–فاعل–فعل'},{value:'OVS',text:'مفعول–فعل–فاعل'},
+          {value:'VSO',text:'فعل–فاعل–مفعول'},{value:'VOS',text:'فعل–مفعول–فاعل'},
+          {value:'other',text:'چیز دیگری'}
+        ])}
+        ${s.order==='other'?`<div class="conditional">${fieldText('state5.structure.customOrder','ترتیب خودتان را توصیف کنید')}</div>`:''}
+        ${fieldArea('state5.structure.why','چرا این ترتیب را انتخاب کردید؟')}
+        ${toggleGroup('state5.structure.changes','آیا جابه‌جایی کلمات معنا را عوض می‌کند؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر'}])}
+        ${s.changes==='yes'?`<div class="conditional">${fieldText('state5.structure.changeExample','مثالی از دو ترتیب با دو معنای متفاوت')}</div>`
+          : s.changes==='no'?`<div class="conditional">${fieldText('state5.structure.markingMethod','پس شنونده چطور فاعل را از مفعول تشخیص می‌دهد؟')}</div>`:''}
+      </div>`;
+  }
+  function renderS5Time(){
+    const t = STATE.state5.time;
+    const opts=[['present','حال'],['past','گذشته'],['future','آینده'],['custom','سیستمی کاملاً متفاوت']];
+    return `
+      <div class="guide"><p>«من سفر می‌کنم» زمانش مبهم است. بیشتر زبان‌ها با زمان دستوری (حال/گذشته/آینده) این را حل می‌کنند — اما فرهنگ شما شاید چیز دیگری برایش مهم باشد: پیش یا پس از طلوع آفتاب، پیش یا پس از یک آیین. تصمیم بگیرید زبان‌تان واقعاً به چه تمایزی نیاز دارد.</p></div>
+      <div class="card">
+        <div class="field"><label>زبان شما چه تمایزهای زمانی دارد؟</label><div class="toggle-group">
+          ${opts.map(([v,txt])=>`<button type="button" class="toggle-btn ${t.sys.includes(v)?'active teal':''}" data-multitoggle="state5.time.sys" data-value="${v}">${txt}</button>`).join('')}
+        </div></div>
+        ${t.sys.includes('custom')?`<div class="conditional">${fieldArea('state5.time.customSys','سیستم زمانی خودتان را توصیف کنید')}</div>`:''}
+        <div class="conditional">
+          <label style="display:block;font-size:12.5px;color:var(--ink-dim);margin-bottom:10px;">یک فعل انتخاب کنید و شکلش را در زمان‌های مختلف بنویسید</label>
+          <div class="row3">
+            ${fieldText('state5.time.verb','فعل پایه')}
+            ${fieldText('state5.time.present','شکل حال')}
+            ${fieldText('state5.time.past','شکل گذشته')}
+          </div>
+          <div style="margin-top:14px;">${fieldText('state5.time.future','شکل آینده')}</div>
+        </div>
+        ${toggleGroup('state5.time.method','این شکل‌ها چطور ساخته می‌شوند؟', [
+          {value:'prefix',text:'پیشوند'},{value:'suffix',text:'پسوند'},{value:'root',text:'تغییر ریشه'},{value:'word',text:'کلمهٔ جداگانه'},{value:'other',text:'روش دیگر'}
+        ])}
+        ${fieldArea('state5.time.methodExplain','توضیح مختصر')}
+      </div>`;
+  }
+  function renderS5Number(){
+    const n = STATE.state5.number;
+    return `
+      <div class="guide"><p>«پرنده پرواز می‌کند» در برابر «پرنده‌ها پرواز می‌کنند» — یکی یا چند تا. برخی زبان‌ها این را روی اسم نشان می‌دهند، برخی فعل و صفت را هم تغییر می‌دهند، برخی اصلاً به آن اهمیتی نمی‌دهند.</p></div>
+      <div class="card">
+        ${toggleGroup('state5.number.has','آیا زبان شما مفرد و جمع را از هم جدا می‌کند؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر'}])}
+        ${n.has==='yes' ? `<div class="conditional">
+          <div class="row2">${fieldText('state5.number.singNoun','یک پرنده →')}${fieldText('state5.number.pluralNoun','چند پرنده →')}</div>
+          <div class="row2" style="margin-top:14px;">${fieldText('state5.number.sentSing','«پرنده پرواز می‌کند» →')}${fieldText('state5.number.sentPlur','«پرنده‌ها پرواز می‌کنند» →')}</div>
+          <div style="margin-top:16px;">
+            ${checkRow('state5.number.verbChanges','فعل هم برای جمع تغییر می‌کند')}
+            ${checkRow('state5.number.adjChanges','صفت هم برای جمع تغییر می‌کند')}
+            ${checkRow('state5.number.pronounChanges','ضمیر هم برای جمع تغییر می‌کند')}
+          </div>
+        </div>` : n.has==='no' ? `<div class="conditional">${fieldArea('state5.number.why','چرا تعداد برای گویشوران شما مهم نیست؟')}</div>` : ''}
+      </div>`;
+  }
+  function renderS5Gender(){
+    const g = STATE.state5.gender;
+    return `
+      <div class="guide"><p>جنسیت دستوری، اسم‌ها را به دسته‌هایی تقسیم می‌کند که می‌تواند روی ضمیر، صفت یا فعل هم اثر بگذارد. کاملاً اختیاری است — بسیاری از زبان‌های دنیا اصلاً آن را ندارند.</p></div>
+      <div class="card">
+        ${toggleGroup('state5.gender.has','آیا زبان شما جنسیت دستوری دارد؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر / بی‌ربط'}])}
+        ${g.has==='yes' ? `<div class="conditional">
+          ${checkRow('state5.gender.nouns','اسم‌ها جنسیت نشان می‌دهند')}
+          ${checkRow('state5.gender.pronouns','ضمیرها جنسیت نشان می‌دهند')}
+          ${checkRow('state5.gender.adjectives','صفت‌ها برای جنسیت تغییر می‌کنند')}
+          ${checkRow('state5.gender.verbs','فعل‌ها برای جنسیت تغییر می‌کنند')}
+          <div class="row3" style="margin-top:14px;">${fieldText('state5.gender.heForm','شکل «او (مذکر)»')}${fieldText('state5.gender.sheForm','شکل «او (مؤنث)»')}${fieldText('state5.gender.theyForm','شکل خنثی/جمع')}</div>
+        </div>` : ''}
+      </div>`;
+  }
+  function renderS5Agreement(){
+    function block(key,title,ex){
+      const v = STATE.state5.agreement[key];
+      return `<div class="field">
+        ${toggleGroup('state5.agreement.'+key, title, [{value:'yes',text:'بله، مطابقت دارند'},{value:'no',text:'مطابقتی نیست'}])}
+        ${v==='yes'?`<div class="conditional">${fieldText('state5.agreement.'+key+'Ex','مثال بزنید','مثلاً '+ex)}</div>`:''}
+      </div>`;
+    }
+    return `
+      <div class="guide"><p>«مطابقت» یعنی شکل یک کلمه مجبور است با کلمهٔ دیگری هماهنگ شود — مثلاً اسم جمع، فعل جمع می‌طلبد. اگر زبان شما تعداد یا جنسیت دارد، تصمیم بگیرید آیا این اجزا باید با هم «جور» باشند یا نه.</p></div>
+      <div class="card">
+        ${block('nounAdj','آیا اسم و صفت با هم مطابقت دارند؟','پرندهٔ بزرگ / پرنده‌های بزرگ')}
+        ${block('subjVerb','آیا فاعل و فعل با هم مطابقت دارند؟','پسر می‌رود / پسرها می‌روند')}
+        ${block('pronounNoun','آیا ضمیر با مرجعش مطابقت دارد؟','او / آن‌ها، بسته به تعداد یا جنسیت')}
+      </div>`;
+  }
+  function renderS5Negation(){
+    return `
+      <div class="guide"><p>«من ماهی می‌خورم» چطور به «من ماهی نمی‌خورم» تبدیل می‌شود؟ یک کلمهٔ جدا، یک وند، تغییر در فعل یا حتی جابه‌جایی ترتیب کلمات — همه می‌توانند این کار را انجام دهند.</p></div>
+      <div class="card">
+        ${toggleGroup('state5.negation.method','منفی‌سازی چطور انجام می‌شود؟', [
+          {value:'word',text:'کلمهٔ جداگانه'},{value:'prefix',text:'پیشوند'},{value:'suffix',text:'پسوند'},
+          {value:'verbchange',text:'تغییر فعل'},{value:'order',text:'تغییر ترتیب'},{value:'other',text:'روش دیگر'}
+        ])}
+        ${fieldArea('state5.negation.explain','توضیح مختصر')}
+        <div class="row2">${fieldText('state5.negation.positive','جملهٔ مثبت')}${fieldText('state5.negation.negative','جملهٔ منفی')}</div>
+      </div>`;
+  }
+  function renderS5Questions(){
+    return `
+      <div class="guide"><p>«تو ماهی می‌خوری» → «آیا تو ماهی می‌خوری؟» برخی زبان‌ها فقط لحن صدا را تغییر می‌دهند؛ برخی نشانهٔ پرسشی، تغییر ترتیب یا شکل ویژهٔ فعل به کار می‌برند.</p></div>
+      <div class="card">
+        ${toggleGroup('state5.questions.method','سؤالی‌سازی چطور انجام می‌شود؟', [
+          {value:'order',text:'تغییر ترتیب'},{value:'word',text:'نشانهٔ پرسشی'},{value:'verb',text:'تغییر فعل'},
+          {value:'ending',text:'پسوند ویژه'},{value:'intonation',text:'فقط لحن'},{value:'other',text:'روش دیگر'}
+        ])}
+        ${fieldArea('state5.questions.explain','توضیح مختصر')}
+        <div class="row2">${fieldText('state5.questions.statement','جملهٔ خبری')}${fieldText('state5.questions.question','جملهٔ پرسشی')}</div>
+      </div>`;
+  }
+  function renderS5Omission(){
+    return `
+      <div class="guide"><p>از «من دیروز ماهی خوردم» شروع کنید و اجزا را یکی‌یکی حذف کنید: فاعل، مفعول، قید زمان. کدام‌ها بدون آسیب به معنا قابل حذف‌اند؟ این نشان می‌دهد زبان شما چقدر به کلمات صریح یا به بافت/فعل تکیه می‌کند.</p></div>
+      <div class="card">
+        ${toggleGroup('state5.omission.subject','آیا فاعل قابل حذف است؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر، الزامی است'}])}
+        ${toggleGroup('state5.omission.object','آیا مفعول قابل حذف است؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر، الزامی است'}])}
+        ${toggleGroup('state5.omission.time','آیا قید زمان قابل حذف است؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر، الزامی است'}])}
+        ${fieldArea('state5.omission.explain','در صورت حذف، شنونده از کجا می‌فهمد چه چیزی حذف شده؟')}
+      </div>`;
+  }
+  function renderS5Test(){
+    function block(key,keyFa,label){
+      return `<div class="row2" style="margin-bottom:16px;">
+        <div><div class="section-eyebrow" style="margin-bottom:8px;">${label} (به زبان شما)</div>${fieldText('state5.test.'+key,'')}</div>
+        <div><div class="section-eyebrow" style="margin-bottom:8px;">معنای فارسی</div>${fieldText('state5.test.'+keyFa,'')}</div>
+      </div>`;
+    }
+    return `
+      <div class="guide"><p>حالا با قواعدی که ساختید، پنج جمله بسازید. اگر در میانهٔ کار مجبور شدید قاعدهٔ تازه‌ای اختراع کنید — طبیعی است؛ همان‌جا یادداشتش کنید.</p></div>
+      <div class="card">
+        ${block('simple','simpleFa','۱. جملهٔ ساده')}
+        ${block('tense','tenseFa','۲. جملهٔ گذشته یا آینده')}
+        ${block('plural','pluralFa','۳. جملهٔ جمع')}
+        ${block('negative','negativeFa','۴. جملهٔ منفی')}
+        ${block('question','questionFa','۵. جملهٔ پرسشی')}
+        ${fieldArea('state5.test.newRule','آیا حین نوشتن این جمله‌ها مجبور شدید قاعدهٔ تازه‌ای اختراع کنید؟ چه قاعده‌ای؟')}
+      </div>`;
+  }
+  function renderS5Challenge(){
+    return `
+      <div class="guide"><p>یک جملهٔ تازه به زبان‌تان بنویسید — بدون توضیح قواعد — و به کسی دیگر بدهید. آیا معنایش را می‌فهمد؟ اگر نه، دقیقاً چه اطلاعاتی کم است؟ اگر جمله دو معنای ممکن دارد، تصمیم بگیرید: این ابهام باید با یک قاعدهٔ تازه از بین برود، یا زبان شما اجازه دارد این ابهام را نگه دارد؟</p></div>
+      <div class="card">
+        ${fieldText('state5.challenge.mystery','جملهٔ مرموز')}
+        ${fieldArea('state5.challenge.missing','وقتی کس دیگری این جمله را خواند، چه اطلاعاتی کم بود یا مبهم بود؟')}
+        ${toggleGroup('state5.challenge.ambiguity','تصمیم شما', [
+          {value:'fix',text:'قاعدهٔ تازه‌ای اضافه می‌کنم تا ابهام از بین برود'},
+          {value:'keep',text:'ابهام را نگه می‌دارم — می‌تواند هر دو معنا را داشته باشد'}
+        ])}
+      </div>`;
+  }
+  const S5_RENDERERS = {
+    structure:renderS5Structure, time:renderS5Time, number:renderS5Number, gender:renderS5Gender,
+    agreement:renderS5Agreement, negation:renderS5Negation, questions:renderS5Questions,
+    omission:renderS5Omission, test:renderS5Test, challenge:renderS5Challenge
+  };
+  function isS5SubFilled(id){
+    return deepFilled(STATE.state5[id]);
+  }
+  function renderState5(sub){
+    const subNav = GRAMMAR_SUB.map(g=>`<div class="subnav-item ${g.id===sub?'active':''} ${isS5SubFilled(g.id)?'filled':''}" data-s5goto="${g.id}">${g.label}</div>`).join('');
+    return `<div class="subnav">${subNav}</div>` + S5_RENDERERS[sub]();
+  }
+
+  /* ---------- ایده: تقویم ---------- */
+  function renderCalendar(){
+    return `
+      <div class="guide"><p>این ایده مستقیماً به بخش «زمان» در گرامرتان مرتبط است: تمدن شما هنوز تقویمی ندارد — بسازیدش. تقویم باید بازتاب‌دهندهٔ همان فرهنگ و باورهایی باشد که در استیت ۱ ساختید.</p></div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۱. واحد زمان</div>
+        ${fieldText('calendar.dayDef','یک «روز» را چطور تعریف می‌کنید؟')}
+        ${fieldText('calendar.monthDef','یک «ماه» را چطور تعریف می‌کنید؟')}
+        ${fieldText('calendar.yearDef','یک «سال» را چطور تعریف می‌کنید؟')}
+        ${fieldArea('calendar.inspiration','از چه پدیدهٔ طبیعی الهام گرفتید؟','مثلاً خورشید، ماه، فصل‌ها یا پدیدهٔ دیگری در دنیای زبان‌تان')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۲. تعداد روزها</div>
+        ${toggleGroup('calendar.yearLength','طول سال را چطور تعیین می‌کنید؟', [
+          {value:'real',text:'بر اساس بازگشت طبیعی (نزدیک ۳۶۵ روز)'},
+          {value:'custom',text:'عددی دلخواه و نمادین (مثلاً دقیقاً ۲۰۰ روز)'}
+        ])}
+        ${fieldText('calendar.monthsCount','چند ماه دارید و هر ماه چند روز است؟','مثلاً ۱۲ ماه، یا ۱۰ ماه نامنظم')}
+        ${fieldArea('calendar.extraDaysHandling','اگر روزهای اضافه (شبیه کبیسه) دارید، با آن‌ها چه می‌کنید؟','چون گردش طبیعی همیشه عدد رُندی نیست، خیلی از تمدن‌ها باید این مازاد را جایی حساب کنند')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۳. تقویم بخشی از فرهنگ</div>
+        ${fieldArea('calendar.cultureFocus','برای تمدن شما چه چیزی از همه مهم‌تر است؟','مثلاً کشاورزی، نجوم یا حکومت')}
+        ${fieldText('calendar.monthNamingBasis','نام‌گذاری ماه‌ها بر چه اساسی است؟','مثلاً ماه بذرپاشی/برداشت برای کشاورزی، صورت‌های فلکی برای نجوم، یا نام پادشاهان برای حکومت')}
+        ${fieldArea('calendar.monthNames','نام ماه‌های تقویم خود را بنویسید (با کاما جدا کنید)')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۴. خروجی نهایی</div>
+        ${fieldArea('calendar.festivals','جشن‌های خاص (پایان سال، شروع سال یا هر جشن دیگر) را توضیح دهید — یا بنویسید که تمدن شما هیچ جشنی ندارد')}
+        ${fieldText('calendar.yearStart','سال از چه رویدادی آغاز می‌شود؟')}
+      </div>`;
+  }
+
+  /* ---------- خلاصهٔ نهایی ---------- */
+  function deepFilled(v){
+    if(Array.isArray(v)) return v.some(deepFilled);
+    if(v && typeof v==='object') return Object.values(v).some(deepFilled);
+    if(typeof v==='boolean') return v;
+    return v!=null && String(v).trim().length>0;
+  }
+  function renderSummary(){
+    const s = STATE;
+    let html = `<div class="summary-card" id="summaryText">`;
+
+    html += `<h3>استیت ۱ — دنیای زبان</h3>`;
+    html += deepFilled(s.state1) ? `
+      <p>موجودات گویشور: ${escapeHtml(s.state1.beings||'—')}</p>
+      <p>مکان و زمان: ${escapeHtml(s.state1.place||'—')}</p>
+      <p>باورها: ${escapeHtml(s.state1.beliefs||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده — به استیت ۱ بروید.</p>`;
+
+    html += `<h3>استیت ۲ — الفبا</h3>`;
+    html += deepFilled(s.state2) ? `
+      <p>مجموعه‌حروف: ${escapeHtml(s.state2.alphabetChoice||'—')}</p>
+      <p>حروف حذف‌شده: ${escapeHtml(s.state2.removed||'—')}</p>
+      <p>نماد جدید: ${escapeHtml(s.state2.added||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده — به استیت ۲ بروید.</p>`;
+
+    html += `<h3>استیت ۳ — کلمات اصلی</h3>`;
+    const filledWords = s.state3.words.filter(w=>w.concept||w.word);
+    html += filledWords.length ? `<p>${filledWords.map(w=>escapeHtml((w.concept||'؟')+' = '+(w.word||'؟'))).join(' · ')}</p>` : `<p class="empty">هنوز کلمه‌ای ثبت نشده — به استیت ۳ بروید.</p>`;
+
+    html += `<h3>استیت ۴ — ساخت کلمات</h3>`;
+    html += deepFilled(s.state4) ? `
+      <p>روش ساخت کلمه: ${escapeHtml(s.state4.method||'—')}</p>
+      <p>نمونه: ${escapeHtml(s.state4.baseWord||'—')} ← جمع: ${escapeHtml(s.state4.pluralForm||'—')} · منفی: ${escapeHtml(s.state4.negForm||'—')} · گذشته: ${escapeHtml(s.state4.pastForm||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده — به استیت ۴ بروید.</p>`;
+
+    html += `<h3>ایده: سیستم شمارش</h3>`;
+    html += deepFilled(s.counting) ? `
+      <p>مبنا: ${escapeHtml(s.counting.baseChoice==='other'?s.counting.customBase:s.counting.baseChoice||'—')}</p>
+      <p>ارزش مکانی: ${s.counting.positional==='yes'?'دارد':(s.counting.positional==='no'?'ندارد (افزایشی)':'—')}</p>
+      <p>صفر: ${s.counting.hasZero==='yes'?('دارد ('+escapeHtml(s.counting.zeroSymbol||'')+')'):(s.counting.hasZero==='no'?'ندارد':'—')}</p>
+      <p>نام سیستم: ${escapeHtml(s.counting.sysName||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده.</p>`;
+
+    html += `<h3>استیت ۵ — گرامر</h3>`;
+    const orderLabel = {SOV:'فاعل–مفعول–فعل',SVO:'فاعل–فعل–مفعول',OSV:'مفعول–فاعل–فعل',OVS:'مفعول–فعل–فاعل',VSO:'فعل–فاعل–مفعول',VOS:'فعل–مفعول–فاعل',other:s.state5.structure.customOrder}[s.state5.structure.order];
+    html += orderLabel ? `<p>ترتیب جمله: ${escapeHtml(orderLabel)}</p>` : `<p class="empty">ترتیب جمله هنوز مشخص نشده.</p>`;
+    if(s.state5.time.sys.length) html += `<p>تمایز زمانی: ${escapeHtml(s.state5.time.sys.join('، '))}</p>`;
+    if(s.state5.number.has) html += `<p>مفرد/جمع: ${s.state5.number.has==='yes'?'دارد':'ندارد'}</p>`;
+    if(s.state5.gender.has) html += `<p>جنسیت دستوری: ${s.state5.gender.has==='yes'?'دارد':'ندارد'}</p>`;
+    if(s.state5.negation.positive||s.state5.negation.negative) html += `<p>منفی‌سازی: ${escapeHtml(s.state5.negation.positive||'—')} ← ${escapeHtml(s.state5.negation.negative||'—')}</p>`;
+    if(s.state5.questions.statement||s.state5.questions.question) html += `<p>پرسشی‌سازی: ${escapeHtml(s.state5.questions.statement||'—')} ← ${escapeHtml(s.state5.questions.question||'—')}</p>`;
+
+    html += `<h3>ایده: تقویم</h3>`;
+    html += deepFilled(s.calendar) ? `
+      <p>روز/ماه/سال: ${escapeHtml(s.calendar.dayDef||'—')} / ${escapeHtml(s.calendar.monthDef||'—')} / ${escapeHtml(s.calendar.yearDef||'—')}</p>
+      <p>ماه‌ها: ${escapeHtml(s.calendar.monthNames||'—')}</p>
+      <p>جشن‌ها: ${escapeHtml(s.calendar.festivals||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده.</p>`;
+
+    html += `<button class="copy-btn" id="copySummary">کپی کردن خلاصه</button></div>`;
+    return html;
+  }
+
+  /* ---------- رندر کلی ---------- */
+  function topLabel(id){ return TOP.find(t=>t.id===id); }
+  function isTopFilled(id){
+    if(id==='summary') return false;
+    return deepFilled(STATE[id]);
+  }
+  function overallProgress(){
+    const real = TOP.filter(t=>t.id!=='summary');
+    const filled = real.filter(t=>isTopFilled(t.id)).length;
+    return Math.round((filled/real.length)*100);
+  }
+  function toFaDigits(n){
+    const map={'0':'۰','1':'۱','2':'۲','3':'۳','4':'۴','5':'۵','6':'۶','7':'۷','8':'۸','9':'۹'};
+    return String(n).replace(/[0-9]/g,d=>map[d]);
+  }
+
+  function renderRail(){
+    const cur = FLOW[flowIndex];
+    const rail = document.getElementById('rail');
+    rail.innerHTML = TOP.map(t=>`
+      <div class="rail-item ${t.id===cur.top?'active':''} ${isTopFilled(t.id)?'filled':''}" data-goto="${t.id}">
+        <span class="rail-num">${t.num}</span><span>${t.label}</span>
+      </div>`).join('');
+    rail.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click', ()=>gotoTop(el.dataset.goto)));
+
+    const tabs = document.getElementById('mobileTabs');
+    tabs.innerHTML = TOP.map(t=>`<div class="mobile-tab ${t.id===cur.top?'active':''}" data-goto="${t.id}">${t.num}. ${t.label}</div>`).join('');
+    tabs.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click', ()=>gotoTop(el.dataset.goto)));
+  }
+  function gotoTop(id){
+    const i = FLOW.findIndex(f=>f.top===id);
+    flowIndex = i>=0?i:0;
+    renderAll();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  function updateProgress(){
+    const pct = overallProgress();
+    document.getElementById('progressFill').style.width = pct+'%';
+    document.getElementById('progressLabel').textContent = toFaDigits(pct)+'٪';
+  }
+
+  const TOP_RENDERERS = {
+    state1:renderState1, state2:renderState2, state3:renderState3, state4:renderState4,
+    counting:renderCounting, calendar:renderCalendar, summary:renderSummary
+  };
+
+  function renderStage(){
+    const cur = FLOW[flowIndex];
+    const meta = topLabel(cur.top);
+    const stage = document.getElementById('stage');
+    let bodyHtml;
+    if(cur.top==='state5'){
+      bodyHtml = renderState5(cur.sub);
+    } else {
+      bodyHtml = TOP_RENDERERS[cur.top]();
+    }
+    const posLabel = `مرحلهٔ ${toFaDigits(flowIndex+1)} از ${toFaDigits(FLOW.length)}`;
+    stage.innerHTML = `
+      <div class="section-head">
+        <div class="section-eyebrow">${posLabel}</div>
+        <h2 class="section-title">${meta.label}${cur.sub?' — '+GRAMMAR_SUB.find(g=>g.id===cur.sub).label:''}</h2>
+      </div>
+      ${bodyHtml}
+      <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn" ${flowIndex===0?'disabled':''}>→ قبلی</button>
+        <button class="nav-btn primary" id="nextBtn" ${flowIndex===FLOW.length-1?'disabled':''}>${flowIndex===FLOW.length-1?'پایان':'بعدی ←'}</button>
+      </div>`;
+    wireStage(stage);
+  }
+
+  function wireStage(stage){
+    stage.querySelectorAll('input[data-field], textarea[data-field]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        setPath(STATE, el.dataset.field, el.value);
+        saveDebounced(); updateProgress(); renderRail();
+      });
+      if(el.dataset.resize==='true'){
+        el.addEventListener('change', ()=>renderStage());
+      }
+    });
+    stage.querySelectorAll('[data-toggle]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const path = el.dataset.toggle, val = el.dataset.value;
+        const curVal = getPath(STATE, path);
+        setPath(STATE, path, curVal===val ? '' : val);
+        saveDebounced(); renderStage(); updateProgress(); renderRail();
+      });
+    });
+    stage.querySelectorAll('[data-multitoggle]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const path = el.dataset.multitoggle, val = el.dataset.value;
+        const arr = getPath(STATE, path);
+        const i = arr.indexOf(val);
+        if(i===-1) arr.push(val); else arr.splice(i,1);
+        saveDebounced(); renderStage(); updateProgress(); renderRail();
+      });
+    });
+    stage.querySelectorAll('[data-check]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const path = el.dataset.check;
+        setPath(STATE, path, !getPath(STATE, path));
+        saveDebounced(); renderStage(); updateProgress(); renderRail();
+      });
+    });
+    stage.querySelectorAll('[data-s5goto]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const idx = FLOW.findIndex(f=>f.top==='state5' && f.sub===el.dataset.s5goto);
+        if(idx>=0){ flowIndex = idx; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
+      });
+    });
+    const prev = document.getElementById('prevBtn');
+    const next = document.getElementById('nextBtn');
+    if(prev) prev.addEventListener('click', ()=>{ if(flowIndex>0){ flowIndex--; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); } });
+    if(next) next.addEventListener('click', ()=>{ if(flowIndex<FLOW.length-1){ flowIndex++; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); } });
+
+    const copyBtn = document.getElementById('copySummary');
+    if(copyBtn){
+      copyBtn.addEventListener('click', async ()=>{
+        const text = document.getElementById('summaryText').innerText;
+        try{ await navigator.clipboard.writeText(text); copyBtn.textContent='کپی شد ✓'; setTimeout(()=>copyBtn.textContent='کپی کردن خلاصه',1400); }
+        catch(e){ copyBtn.textContent='کپی نشد'; }
+      });
+    }
+  }
+
+  function renderAll(){ renderRail(); renderStage(); updateProgress(); }
+
+  document.getElementById('resetBtn').addEventListener('click', async ()=>{
+    if(!confirm('همهٔ پاسخ‌های این کارگاه پاک شود؟ این کار قابل بازگشت نیست.')) return;
+    STATE = defaultState();
+    try{ await window.storage.delete(STORAGE_KEY, false); }catch(e){}
+    flowIndex = 0;
+    renderAll();
+  });
+
+  (async function init(){
+    await load();
+    renderAll();
+  })();
+
+})();
+</script>
+</body>
+</html>

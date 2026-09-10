@@ -530,4 +530,542 @@
         ${fieldText('state5.challenge.mystery','جملهٔ مرموز')}
         ${fieldArea('state5.challenge.missing','وقتی کس دیگری این جمله را خواند، چه اطلاعاتی کم بود یا مبهم بود؟')}
         ${toggleGroup('state5.challenge.ambiguity','تصمیم شما', [
-         
+          {value:'fix',text:'قاعدهٔ تازه‌ای اضافه می‌کنم تا ابهام از بین برود'},
+          {value:'keep',text:'ابهام را نگه می‌دارم — می‌تواند هر دو معنا را داشته باشد'}
+        ])}
+      </div>`;
+  }
+  const S5_RENDERERS = {
+    structure:renderS5Structure, time:renderS5Time, number:renderS5Number, gender:renderS5Gender,
+    agreement:renderS5Agreement, negation:renderS5Negation, questions:renderS5Questions,
+    omission:renderS5Omission, test:renderS5Test, challenge:renderS5Challenge
+  };
+  function isS5SubFilled(id){
+    return deepFilled(STATE.state5[id]);
+  }
+  function renderState5(sub){
+    const subNav = GRAMMAR_SUB.map(g=>`<div class="subnav-item ${g.id===sub?'active':''} ${isS5SubFilled(g.id)?'filled':''}" data-s5goto="${g.id}">${g.label}</div>`).join('');
+    return `<div class="subnav">${subNav}</div>` + S5_RENDERERS[sub]();
+  }
+
+  function countingBaseNumber(){
+    const c = STATE.counting;
+    if(c.baseChoice==='other'){ const n=parseInt(c.customBase,10); return (n>=2&&n<=24)?n:10; }
+    if(c.baseChoice){ return parseInt(c.baseChoice,10); }
+    return 10;
+  }
+  function renderCounting(){
+    const base = countingBaseNumber();
+    adjustLen(STATE.counting.symbols, base, '');
+    const symbolRows = STATE.counting.symbols.map((s,i)=>`
+      <div class="table-row"><div class="idx">${i+1}</div>
+        <input type="text" data-field="counting.symbols.${i}" value="${escapeHtml(s)}" placeholder="نماد برای مقدار ${i+1}"></div>`).join('');
+    const opsRows = STATE.counting.opsExamples.map((o,i)=>`
+      <div class="row2" style="margin-bottom:10px;">
+        <input type="text" data-field="counting.opsExamples.${i}.problem" value="${escapeHtml(o.problem)}" placeholder="مسئله ${i+1} — مثلاً ۴ + ۳ به نمادهای خودتان">
+        <input type="text" data-field="counting.opsExamples.${i}.answer" value="${escapeHtml(o.answer)}" placeholder="پاسخ با سیستم خودتان">
+      </div>`).join('');
+    return `
+      <div class="guide">
+        <p>این یک فعالیت فرهنگی جانبی است: پیش از آن‌که سراغ گرامر کامل بروید، تصمیم بگیرید تمدنِ گویشوران شما اصلاً چطور می‌شمارد. نتیجهٔ این بخش می‌تواند مستقیماً روی نحوهٔ ساخت کلمات عددی در استیت ۴ اثر بگذارد.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۱. اصلاً عدد نداریم</div>
+        ${fieldArea('counting.noNumberMethod','فرض کنید هنوز نماد عددی اختراع نشده. چند دسته از چیزها (مثلاً سنگ) با تعداد متفاوت پیش رو دارید؛ استفاده از اعداد ۱،۲،۳... ممنوع است. چطور مقدار هر دسته را ثبت می‌کنید؟ از کجا می‌فهمید کدام دسته بیشتر است؟','مثال: با کشیدن یک خط برای هر واحد، یا چیدن سنگ‌ها در ردیف و مقایسهٔ طول ردیف‌ها','با اعدادی نسبتاً بزرگ (مثلاً ۲۰۰ یا ۳۰۰) امتحان کنید تا ببینید این روش چقدر سخت می‌شود.')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۲. ساخت مبنا</div>
+        <div class="guide" style="margin-bottom:14px;">
+          <p>برای این‌که مجبور نباشید برای هر عدد یک نماد کاملاً جدا بسازید، اعداد را دسته‌بندی می‌کنید — مثلاً هر ۵ تا یا هر ۲۰ تا یک گروه. این عدد دسته‌بندی، «مبنا»ی سیستم شماست.</p>
+        </div>
+        ${toggleGroup('counting.baseChoice','مبنای سیستم شمارش‌تان را انتخاب کنید', [
+          {value:'5',text:'۵'},{value:'10',text:'۱۰'},{value:'20',text:'۲۰'},{value:'other',text:'مبنای دیگر'}
+        ])}
+        ${STATE.counting.baseChoice==='other'?`<div class="conditional">${fieldText('counting.customBase','مبنای دلخواه (یک عدد بین ۲ تا ۲۴)','مثلاً ۱۲ یا ۶۰','', 'data-resize="true"')}</div>`:''}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۳. جدول اعداد و نماد</div>
+        <div class="guide" style="margin-bottom:14px;"><p>بر اساس مبنایی که انتخاب کردید، برای مقادیر ۱ تا ${base} یک نماد بسازید. بقیهٔ اعداد بعداً از ترکیب همین نمادها ساخته می‌شوند.</p></div>
+        <div class="table-rows">${symbolRows}</div>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۴. ارزش مکانی</div>
+        ${toggleGroup('counting.positional','آیا تکرار یک نماد، بسته به جایگاهش، معنای متفاوتی دارد؟', [
+          {value:'yes',text:'بله — سیستم ارزش مکانی دارم'},
+          {value:'no',text:'خیر — نمادها فقط جمع می‌شوند (سیستم افزایشی)'}
+        ])}
+        ${fieldArea('counting.positionalExplain','قانونش را توضیح دهید','مثال: اگر نماد عدد یک ☆ باشد، آیا ☆☆ یعنی «دو» یا یعنی «یازده»؟ کدام را انتخاب کردید و چرا؟')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۵. عدد صفر</div>
+        ${toggleGroup('counting.hasZero','آیا سیستم شما نماد مستقلی برای صفر دارد؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر — فعلاً صفر ندارم'}])}
+        ${STATE.counting.hasZero==='yes'
+          ? `<div class="conditional">${fieldText('counting.zeroSymbol','نماد صفر چیست؟')}</div>`
+          : `<div class="conditional">${fieldArea('counting.zeroExplain','بدون نماد صفر، چطور نبودِ مقدار را نشان می‌دهید؟','مثال: انبار شما از یک کالا هیچ موجودی ندارد؛ یا باید عدد ۲۱۰ سرباز را در نامه‌ای به پادشاه بنویسید — چطور می‌نویسید؟')}</div>`}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۶. عملیات</div>
+        ${toggleGroup('counting.opsChoice','چه عملیاتی در سیستم شما تعریف می‌شود؟', [
+          {value:'addsub',text:'فقط جمع و تفریق'},{value:'all4',text:'هر چهار عمل اصلی'}
+        ])}
+        <div class="conditional">
+          <label style="display:block;font-size:12.5px;color:var(--ink-dim);margin-bottom:10px;">چند مسئله با نمادهای خودتان حل کنید</label>
+          ${opsRows}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۷. اسم سیستم</div>
+        ${fieldText('counting.sysName','بر اساس فرهنگ تمدن‌تان، اسمی برای این سیستم شمارش انتخاب کنید','مثال: اگر نجوم مهم است، «سیستم خورشیدی»؛ اگر دزدان دریایی‌اند، «سیستم اسکلتی»')}
+        ${fieldArea('counting.sysNameWhy','چرا این اسم را انتخاب کردید؟')}
+      </div>`;
+  }
+
+  function renderCalendar(){
+    return `
+      <div class="guide">
+        <p><strong>چرا زبان بر درک ما از زمان تأثیر می‌گذارد؟</strong><br>
+        زبان فقط ابزاری برای انتقال اطلاعات نیست، بلکه چارچوبی است که ذهن ما را برای درک مفاهیم انتزاعی مانند زمان شکل می‌دهد. نحوهٔ بیان زمان در یک زبان، مستقیماً بر «حافظه»، «برنامه‌ریزی» و «تصور ذهنی» گویشوران از توالی رویدادها اثر می‌گذارد.</p>
+        <p style="margin-top:12px;"><strong>۳ فکت جالب دربارهٔ زبان و درک زمان:</strong></p>
+        <ul style="padding-right:20px; margin-top:8px; color:var(--ink-dim);">
+          <li><strong>جهت‌گیری فضایی-زمانی:</strong> در زبان‌هایی که از راست به چپ نوشته می‌شوند (مثل فارسی و عربی)، گویشوران به‌طور ناخودآگاه تمایل دارند زمان را نیز از راست به چپ تصور کنند (گذشته در سمت راست، آینده در سمت چپ). در حالی که در زبان‌های چپ‌به‌راست (مثل انگلیسی)، این تصور برعکس است.</li>
+          <li><strong>استعاره‌های متضاد:</strong> در بیشتر زبان‌ها آینده «جلو» و گذشته «پشت سر» است. اما در زبان آیمارا (Aymara) در آمریکای جنوبی، برعکس است: گذشته «جلو» است (چون آن را «می‌بینیم» و می‌شناسیم) و آینده «پشت سر» است (چون نامرئی و ناشناخته است).</li>
+          <li><strong>اجبار دستوری:</strong> در زبان‌هایی مثل انگلیسی، صرف فعل برای نشان دادن زمان (گذشته/حال/آینده) اجباری است. اما در زبان‌هایی مثل چینی ماندارین یا فارسی محاوره‌ای، فعل لزوماً تغییر شکل نمی‌دهد و زمان از طریق قیدها (دیروز، فردا) مشخص می‌شود. این باعث می‌شود گویشوران این زبان‌ها توجه بیشتری به «تکمیل‌شدگی» یا «بافت» رویداد داشته باشند تا صرفاً نقطهٔ زمانی آن.</li>
+        </ul>
+        <p style="margin-top:12px;">حالا که این تأثیرات را می‌دانید، تقویم و مفهوم زمان را برای زبان خود بسازید:</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۱. واحد زمان</div>
+        ${fieldText('calendar.dayDef','یک «روز» را چطور تعریف می‌کنید؟')}
+        ${fieldText('calendar.monthDef','یک «ماه» را چطور تعریف می‌کنید؟')}
+        ${fieldText('calendar.yearDef','یک «سال» را چطور تعریف می‌کنید؟')}
+        ${fieldArea('calendar.inspiration','از چه پدیدهٔ طبیعی الهام گرفتید؟','مثلاً خورشید، ماه، فصل‌ها یا پدیدهٔ دیگری در دنیای زبان‌تان')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۲. تعداد روزها</div>
+        ${toggleGroup('calendar.yearLength','طول سال را چطور تعیین می‌کنید؟', [
+          {value:'real',text:'بر اساس بازگشت طبیعی (نزدیک ۳۶۵ روز)'},
+          {value:'custom',text:'عددی دلخواه و نمادین (مثلاً دقیقاً ۲۰۰ روز)'}
+        ])}
+        ${fieldText('calendar.monthsCount','چند ماه دارید و هر ماه چند روز است؟','مثلاً ۱۲ ماه، یا ۱۰ ماه نامنظم')}
+        ${fieldArea('calendar.extraDaysHandling','اگر روزهای اضافه (شبیه کبیسه) دارید، با آن‌ها چه می‌کنید؟','چون گردش طبیعی همیشه عدد رُندی نیست، خیلی از تمدن‌ها باید این مازاد را جایی حساب کنند')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۳. تقویم بخشی از فرهنگ</div>
+        ${fieldArea('calendar.cultureFocus','برای تمدن شما چه چیزی از همه مهم‌تر است؟','مثلاً کشاورزی، نجوم یا حکومت')}
+        ${fieldText('calendar.monthNamingBasis','نام‌گذاری ماه‌ها بر چه اساسی است؟','مثلاً ماه بذرپاشی/برداشت برای کشاورزی، صورت‌های فلکی برای نجوم، یا نام پادشاهان برای حکومت')}
+        ${fieldArea('calendar.monthNames','نام ماه‌های تقویم خود را بنویسید (با کاما جدا کنید)')}
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۴. خروجی نهایی</div>
+        ${fieldArea('calendar.festivals','جشن‌های خاص (پایان سال، شروع سال یا هر جشن دیگر) را توضیح دهید — یا بنویسید که تمدن شما هیچ جشنی ندارد')}
+        ${fieldText('calendar.yearStart','سال از چه رویدادی آغاز می‌شود؟')}
+      </div>`;
+  }
+
+  function renderAppendix1(){
+    return `
+      <div class="guide">
+        <p>این بخش به بررسی زبان‌های باستانی ایران می‌پردازد. آشنایی با این زبان‌ها می‌تواند الهام‌بخش ساختار، واژگان یا خط زبان ساخته‌شده توسط شما باشد.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:18px;margin-bottom:12px;">اوستایی</div>
+        <p>اوستایی یکی از زبان‌های ایرانی باستان و زبان متون اوستا، مجموعه متون دینی زرتشتی، است. این زبان احتمالاً در بخش‌هایی از سرزمین‌های شرقی و شمال‌شرقی ایران باستان رواج داشته است. اوستایی را معمولاً به دو مرحله تقسیم می‌کنند: اوستایی کهن و اوستایی نوین. اوستایی کهن، قدیمی‌ترین بخش اوستا است و قدمت آن احتمالاً به هزارهٔ دوم پیش از میلاد می‌رسد. اوستایی نوین در بخش‌های دیگر اوستا دیده می‌شود و از نظر زبانی جدیدتر است.</p>
+        <p>برای مدت بسیار طولانی، اوستا به صورت شفاهی منتقل می‌شد. موبدان متن‌ها را حفظ می‌کردند و از نسلی به نسل دیگر می‌آموختند. بنابراین زبان اوستایی وجود داشت، اما برای مدت زیادی خط مخصوصی برای نوشتن آن وجود نداشت. مشکل زمانی جدی‌تر شد که لازم بود متن‌های اوستا با دقت بسیار زیادی ثبت شوند. تلفظ دقیق واژه‌ها در متون دینی اهمیت زیادی داشت، اما خط‌های موجود، به‌ویژه خط پهلوی، برای نشان دادن همهٔ تفاوت‌های ظریف آوایی اوستایی مناسب نبودند. یک نشانه ممکن بود چند صدای متفاوت را نشان دهد و این مسئله می‌توانست باعث ابهام در خواندن متن شود.</p>
+        <p>خط اوستایی از صفر ساخته نشده بود. پایهٔ اصلی آن خط پهلوی بود که خود ریشه در سنت‌های نوشتاری پیشین، به‌ویژه سنت آرامی، داشت. سازندگان خط اوستایی برخی شکل‌های موجود را اقتباس کردند، بعضی را تغییر دادند و برای صداهایی که در خط‌های قبلی به‌خوبی قابل نمایش نبودند، نشانه‌های جداگانه ایجاد کردند. به همین دلیل خط اوستایی تعداد زیادی نشانه دارد. حدود ۵۴ نشانه برای آن شمرده می‌شود. وجود نشانه‌های متعدد برای واکه و صامت‌های مختلف نشان می‌دهد که هدف اصلی این خط، ثبت دقیق تلفظ بوده است.</p>
+        
+        <table class="ancient-table">
+          <thead><tr><th>نشانه اوستایی</th><th>معادل / تلفظ فارسی</th></tr></thead>
+          <tbody>
+            <tr><td class="ancient-char">𐬀</td><td>a (َ )</td></tr>
+            <tr><td class="ancient-char">𐬁</td><td>ā (آ)</td></tr>
+            <tr><td class="ancient-char">𐬇</td><td>å (او کوتاه)</td></tr>
+            <tr><td class="ancient-char">𐬈</td><td>e (ِ )</td></tr>
+            <tr><td class="ancient-char">𐬉</td><td>ē (ای)</td></tr>
+            <tr><td class="ancient-char">𐬊</td><td>o (ُ )</td></tr>
+            <tr><td class="ancient-char">𐬋</td><td>ō (او)</td></tr>
+            <tr><td class="ancient-char">𐬑</td><td>x (خ)</td></tr>
+            <tr><td class="ancient-char">𐬔</td><td>g (گ)</td></tr>
+            <tr><td class="ancient-char">𐬛</td><td>d (د)</td></tr>
+            <tr><td class="ancient-char">𐬢</td><td>m (م)</td></tr>
+            <tr><td class="ancient-char">𐬣</td><td>n (ن)</td></tr>
+            <tr><td class="ancient-char">𐬧</td><td>r (ر)</td></tr>
+            <tr><td class="ancient-char">𐬨</td><td>l (ل)</td></tr>
+            <tr><td class="ancient-char">𐬩</td><td>s (س)</td></tr>
+            <tr><td class="ancient-char">𐬪</td><td>z (ز)</td></tr>
+            <tr><td class="ancient-char">𐬬</td><td>š (ش)</td></tr>
+            <tr><td class="ancient-char">𐬯</td><td>h (ه)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:18px;margin-bottom:12px;">فارسی پهلویِ ساسانی (فارسی میانه)</div>
+        <p>پهلوی ساسانی یا فارسی میانه، زبان رایج و مهم دورهٔ ساسانیان بود. این زبان از حدود سدهٔ سوم میلادی، هم‌زمان با شکل‌گیری حکومت ساسانی، اهمیت زیادی پیدا کرد و تا پایان این دوره در سدهٔ هفتم میلادی در نوشته‌های رسمی، دینی و ادبی به کار می‌رفت. پهلوی ساسانی ادامهٔ تحول زبان‌های ایرانیِ پیش از خود بود. این زبان از فارسی باستان که در دورهٔ هخامنشیان استفاده می‌شد، به‌صورت مستقیم و ناگهانی به وجود نیامد؛ بلکه در طول چند قرن، ساختار و واژگان زبان‌های ایرانی تغییر کرد و به فارسی میانه رسید.</p>
+        <p>خطی که برای نوشتن پهلوی ساسانی استفاده می‌شد، از سنت خط آرامی به وجود آمده بود. این خط در طول زمان تغییر کرده و با زبان فارسی میانه سازگار شده بود. حروف آن معمولاً ساده و نسبتاً پیوسته نوشته می‌شدند و همین موضوع باعث می‌شد بعضی حروف از نظر ظاهری بسیار شبیه یکدیگر باشند. شکل حروف پهلوی ساسانی معنای تصویری مشخصی ندارد. یعنی هر حرف به این دلیل که مثلاً شبیه یک شیء خاص است، آن صدا را نشان نمی‌دهد. شکل حروف نتیجهٔ تحول تدریجی خط آرامی و تغییرات نوشتاری آن در محیط ایرانی است.</p>
+        
+        <table class="ancient-table">
+          <thead><tr><th>نشانه پهلوی ساسانی</th><th>معادل / تلفظ فارسی (چندگانه)</th></tr></thead>
+          <tbody>
+            <tr><td class="ancient-char">𐭠</td><td>ا، آ</td></tr>
+            <tr><td class="ancient-char">𐭡</td><td>ب</td></tr>
+            <tr><td class="ancient-char">𐭢</td><td>گ، ج، چ، ی</td></tr>
+            <tr><td class="ancient-char">𐭣</td><td>د</td></tr>
+            <tr><td class="ancient-char">𐭤</td><td>ه، خ، ح، ع</td></tr>
+            <tr><td class="ancient-char">𐭥</td><td>و</td></tr>
+            <tr><td class="ancient-char">𐭦</td><td>ر</td></tr>
+            <tr><td class="ancient-char">𐭧</td><td>ش، س، ص</td></tr>
+            <tr><td class="ancient-char">𐭨</td><td>ک، گ</td></tr>
+            <tr><td class="ancient-char">𐭩</td><td>ی، ای</td></tr>
+            <tr><td class="ancient-char">𐭪</td><td>ف، ب، پ</td></tr>
+            <tr><td class="ancient-char">𐭫</td><td>ل</td></tr>
+            <tr><td class="ancient-char">𐭬</td><td>م</td></tr>
+            <tr><td class="ancient-char">𐭭</td><td>ن</td></tr>
+          </tbody>
+        </table>
+        <p class="hint" style="margin-top:10px;">* به دلیل ابهام ذاتی خط پهلوی، هر نشانه می‌توانست چندین صدای متفاوت را نشان دهد و خواننده باید از روی بافت متن، تلفظ صحیح را حدس می‌زد.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:18px;margin-bottom:12px;">پهلوی اشکانی (پارتی)</div>
+        <p>پهلوی اشکانی یا پارتی یکی از زبان‌های ایرانی میانه بود که در دورهٔ اشکانیان، تقریباً از سدهٔ سوم پیش از میلاد تا سدهٔ سوم میلادی، در بخش‌هایی از شمال و شمال‌شرق ایران و سرزمین‌های پیرامون آن استفاده می‌شد. این زبان از زبان‌های ایرانی باستانِ پیش از خود تحول پیدا کرده بود و بعدها بر شکل‌گیری برخی زبان‌های ایرانی، به‌ویژه در نواحی شرقی و شمال‌شرقی ایران، تأثیر گذاشت.</p>
+        <p>پارتی در آغاز بیشتر به صورت شفاهی استفاده می‌شد. برای نوشتن آن از خطی برگرفته از آرامی استفاده می‌کردند. این خط به‌تدریج در محیط اشکانی تغییر کرد و با زبان پارتی سازگار شد و چیزی که امروزه «خط پهلوی اشکانی» یا «پهلوی پارتی» می‌نامیم شکل گرفت. یکی از مهم‌ترین شواهد زبان و خط پارتی، کتیبه‌ها و سکه‌های دورهٔ اشکانی هستند. پهلوی اشکانی و پهلوی ساسانی بسیار به هم نزدیک‌اند، اما یکی نیستند. هر دو از سنت نوشتاری آرامی سرچشمه گرفته‌اند، ولی زبان‌های متفاوتی هستند و تفاوت‌هایی در واژگان، دستور زبان و شیوهٔ نوشتن دارند.</p>
+        
+        <table class="ancient-table">
+          <thead><tr><th>نشانه پهلوی اشکانی</th><th>معادل / تلفظ فارسی</th></tr></thead>
+          <tbody>
+            <tr><td class="ancient-char">𐭁</td><td>ب</td></tr>
+            <tr><td class="ancient-char">𐭃</td><td>د</td></tr>
+            <tr><td class="ancient-char">𐭅</td><td>و، ا</td></tr>
+            <tr><td class="ancient-char">𐭆</td><td>ر</td></tr>
+            <tr><td class="ancient-char">𐭇</td><td>ش، س</td></tr>
+            <tr><td class="ancient-char">𐭈</td><td>ک</td></tr>
+            <tr><td class="ancient-char">𐭉</td><td>ی</td></tr>
+            <tr><td class="ancient-char">𐭊</td><td>ف</td></tr>
+            <tr><td class="ancient-char">𐭋</td><td>ل</td></tr>
+            <tr><td class="ancient-char">𐭌</td><td>م</td></tr>
+            <tr><td class="ancient-char">𐭍</td><td>ن</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:18px;margin-bottom:12px;">پارسی هخامنشی (پارسی باستان)</div>
+        <p>پارسی باستان زبان رسمی و درباری شاهنشاهی هخامنشی بود و از حدود سدهٔ ششم تا چهارم پیش از میلاد در بخش‌هایی از ایران و سرزمین‌های زیر فرمان هخامنشیان استفاده می‌شد. مهم‌ترین نمونه‌های باقی‌مانده از آن در کتیبه‌های شاهان هخامنشی، به‌ویژه کتیبه‌های داریوش و خشایارشا، دیده می‌شود.</p>
+        <p>پارسی باستان یکی از زبان‌های ایرانی باستان است و با اوستایی خویشاوندی نزدیکی دارد. البته این دو زبان یکی نیستند؛ اوستایی بیشتر در متون دینی حفظ شده، در حالی که پارسی باستان را بیشتر از کتیبه‌های سلطنتی می‌شناسیم. برای نوشتن پارسی باستان، خطی به نام خط میخی پارسی باستان استفاده می‌شد. برخلاف پهلوی که از سنت آرامی آمده بود، خط میخی پارسی باستان یک نظام نوشتاری متفاوت بود و برای نوشتن پارسی باستان در دورهٔ هخامنشی به کار می‌رفت. این خط از خط میخی بین‌النهرین الهام گرفته بود، اما همان خط میخی پیچیدهٔ اکدی و یا سومری نبود. نشانه‌های آن بسیار ساده‌تر و محدودتر بودند و مخصوص پارسی باستان تنظیم شده بودند.</p>
+        <p>در خط میخی پارسی باستان، بعضی نشانه‌ها یک واکه یا صامت را نشان می‌دادند و بعضی دیگر یک هجای کامل را. برای مثال، نشانه‌هایی برای صداهایی مانند a، i و u وجود داشت و نشانه‌های هجایی مانند da، di و du نیز استفاده می‌شدند. یکی از دلایل مهمی که شکل نشانه‌ها را توضیح می‌دهد، همین ارتباط تاریخی با سنت خط میخی است. نشانه‌ها در اصل با فشار دادن ابزار نوک‌گوهی روی گل ساخته می‌شدند؛ به همین دلیل ظاهرشان از مجموعه‌ای از خطوط و گوه‌های کوچک تشکیل می‌شد. کتیبه‌های پارسی باستان معمولاً از چپ به راست نوشته می‌شدند؛ برخلاف خط‌های پهلوی و اوستایی که راست به چپ بودند.</p>
+        
+        <table class="ancient-table">
+          <thead><tr><th>نشانه میخی پارسی باستان</th><th>معادل / تلفظ فارسی</th></tr></thead>
+          <tbody>
+            <tr><td class="ancient-char">𐎠</td><td>a (آ)</td></tr>
+            <tr><td class="ancient-char">𐎡</td><td>i (ای)</td></tr>
+            <tr><td class="ancient-char">𐎢</td><td>u (او)</td></tr>
+            <tr><td class="ancient-char">𐎣</td><td>k (ک)</td></tr>
+            <tr><td class="ancient-char">𐎥</td><td>g (گ)</td></tr>
+            <tr><td class="ancient-char">𐎫</td><td>t (ت)</td></tr>
+            <tr><td class="ancient-char">𐎭</td><td>d (د)</td></tr>
+            <tr><td class="ancient-char">𐎴</td><td>n (ن)</td></tr>
+            <tr><td class="ancient-char">𐎱</td><td>p (پ)</td></tr>
+            <tr><td class="ancient-char">𐎲</td><td>b (ب)</td></tr>
+            <tr><td class="ancient-char">𐎶</td><td>m (م)</td></tr>
+            <tr><td class="ancient-char">𐎹</td><td>y (ی)</td></tr>
+            <tr><td class="ancient-char">𐎼</td><td>r (ر)</td></tr>
+            <tr><td class="ancient-char">𐎽</td><td>s (س)</td></tr>
+            <tr><td class="ancient-char">𐏀</td><td>z (ز)</td></tr>
+            <tr><td class="ancient-char">𐏃</td><td>h (ه)</td></tr>
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderAppendix2(){
+    return `
+      <div class="guide">
+        <p>این بخش به بررسی تنوع شگفت‌انگیز زبان‌های دنیا در بیان مفاهیم دستوری (مانند جمع، گذشته، منفی و...) می‌پردازد. آشنایی با این الگوها می‌تواند به شما در طراحی قواعد خلاقانه برای زبان خودتان کمک کند.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:18px;margin-bottom:12px;">کلمه‌ها در زبان‌های مختلف چطور تغییر می‌کنند؟</div>
+        <p>وقتی در یک زبان می‌خواهیم مفهومی مثل «جمع بودن»، «گذشته بودن»، «منفی بودن» یا «انجام‌دهندهٔ کار» را بیان کنیم، یک سؤال مهم پیش می‌آید: این اطلاعات را کجای زبان قرار دهیم؟</p>
+        <p>در فارسی، برای بعضی از این کارها از واژه‌های جداگانه استفاده می‌کنیم، برای بعضی از پیشوند و پسوند، و برای بعضی از تغییرات خود کلمه. مثلاً: <span class="example">خانه → خانه‌ها</span>، <span class="example">می‌روم → نرفتم</span>، <span class="example">دانش → دانشمند</span>.</p>
+        <p>اما این تنها یکی از هزاران راهی است که زبان‌های دنیا برای چنین کاری پیدا کرده‌اند. در بعضی زبان‌ها چیزی به اول کلمه اضافه می‌شود و در بعضی به آخر آن. گاهی چیزی وسط کلمه قرار می‌گیرد. گاهی خود صداهای کلمه تغییر می‌کنند. گاهی کل کلمه تکرار می‌شود. گاهی یک واژه کاملاً جداگانه این کار را انجام می‌دهد. حتی ممکن است فقط زیر و بمی صدا تغییر کند و همین تغییر، معنی یا نقش دستوری را عوض کند.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۱. ترکی: ترکیب پسوندها پشت سر هم</div>
+        <p>زبان ترکی استانبولی نمونه بسیار جالبی از زبانی است که برای ساخت شکل‌های مختلف یک کلمه از پسوندهای متعدد استفاده می‌کند. مثلاً: <span class="example">ev = خانه</span> → <span class="example">evler = خانه‌ها</span>. در اینجا -ler نشانهٔ جمع است. اما می‌توان پسوندهای دیگری را هم بعد از آن آورد: <span class="example">ev → evler → evlerimiz</span> (خانه → خانه‌ها → خانه‌های ما).</p>
+        <p>در ترکی، بسیاری از این پسوندها از هماهنگی واکه‌ای پیروی می‌کنند. مثلاً پسوند جمع بسته به واکه‌های کلمه می‌تواند -ler یا -lar باشد. ترکی فقط برای اسم‌ها از این سیستم استفاده نمی‌کند. زمان و شخص فعل نیز می‌تواند با مجموعه‌ای از پسوندها بیان شود.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۲. اندونزیایی: جمع با تکرار</div>
+        <p>در زبان اندونزیایی، یکی از روش‌های ساخت جمع، تکرار کامل کلمه است. مثلاً: <span class="example">rumah = خانه</span> → <span class="example">rumah-rumah = خانه‌ها</span> و <span class="example">buku = کتاب</span> → <span class="example">buku-buku = کتاب‌ها</span>. به این پدیده تکرار یا reduplication گفته می‌شود. اما تکرار در زبان‌های دنیا فقط برای جمع نیست. در زبان‌های مختلف، تکرار می‌تواند برای بیان مفاهیمی مانند تکرار شدن یک عمل، شدت، تنوع، یا معانی دیگری نیز استفاده شود.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۳. پانگاسینان: تکرار بخشی از کلمه</div>
+        <p>در زبان‌هایی که از تکرار استفاده می‌کنند، همیشه کل کلمه تکرار نمی‌شود. گاهی فقط یک هجا، چند صدا یا بخشی از کلمه تکرار می‌شود. زبان Pangasinan در فیلیپین نمونه جالب‌تری از تکرار دارد. برای ساخت جمع، بخش‌های متفاوتی از کلمه می‌توانند تکرار شوند: <span class="example">toó → totóo</span> (مرد → مردم) یا <span class="example">plato → papláto</span> (بشقاب → بشقاب‌ها) یا <span class="example">manók → manómanók</span> (مرغ → مرغ‌ها). یعنی زبان فقط یک قانون سادهٔ «کل کلمه را دوباره بنویس» ندارد.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۴. سواحیلی: یک پیشوند می‌تواند اطلاعات زیادی بدهد</div>
+        <p>زبان سواحیلی که در بخش‌هایی از شرق آفریقا صحبت می‌شود، از پیشوندها به شکل گسترده‌ای استفاده می‌کند. برای نمونه: <span class="example">mtu → watu</span> (انسان → انسان‌ها) و <span class="example">mti → miti</span> (درخت → درخت‌ها). در اینجا برای تغییر تعداد شکل ابتدای اسم تغییر می‌کند. نکته جالب‌تر این است که این پیشوندها بخشی از یک سیستم بزرگ‌تر به نام «رده‌های اسمی» (noun classes) هستند که می‌تواند روی کلمات دیگری که با اسم در جمله می‌آیند نیز اثر بگذارد.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۵. عربی: تغییر الگوی داخلی کلمه</div>
+        <p>بسیاری از واژه‌ها بر اساس یک ریشه ساخته می‌شوند و الگوهای مختلفی روی این ریشه قرار می‌گیرند. مثلاً ریشه «ک‌ت‌ب» با مفهوم کلی نوشتن ارتباط دارد. از این ریشه، با قرار گرفتن در الگوهای مختلف، واژه‌هایی مانند <span class="example">kataba (نوشت)</span>، <span class="example">kātib (نویسنده)</span>، <span class="example">kitāb (کتاب)</span> و <span class="example">maktab (دفتر/محل کار)</span> ساخته می‌شوند.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۶. انگلیسی: گذشته گاهی فقط یک پسوند است، گاهی خود کلمه عوض می‌شود</div>
+        <p>در انگلیسی، یکی از روش‌های معمول ساخت گذشته، اضافه کردن -ed است: <span class="example">paint → painted</span>. اما همه فعل‌ها این‌طور نیستند: <span class="example">go → went</span>. اینجا دیگر چیزی به go اضافه نشده است بلکه شکل کلمه به‌طور کامل تغییر کرده است. به تغییر کاملاً متفاوت شکل یک واژه برای بیان یک نقش دستوری یا معنایی، <strong>suppletion</strong> گفته می‌شود (مثل good → better → best).</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۷. فرانسوی: منفی کردن از دو طرف</div>
+        <p>برای منفی کردن یک جمله در زبان فرانسوی، یک علامت منفی کافی نیست. در ساختار سنتی فرانسوی، منفی‌سازی با دو جزء انجام می‌شود: <span class="example">Je vois la lune</span> (من ماه را می‌بینم) → <span class="example">Je ne vois pas la lune</span> (من ماه را نمی‌بینم). در اینجا ne ... pas دو طرف فعل قرار گرفته‌اند.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۸. فنلاندی: آینده همیشه لازم نیست شکل فعل را عوض کند</div>
+        <p>ما معمولاً فکر می‌کنیم اگر جمله‌ای دربارهٔ آینده باشد، باید فعل را به شکلی تغییر دهیم. اما در فنلاندی، برای اشاره به آینده در بسیاری از موقعیت‌ها می‌توان از زمان حال استفاده کرد و زمان آینده را از بافت یا کلماتی مثل «فردا» فهمید.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۹. کیسی (Kisi): تغییر زیر و بمی صدا</div>
+        <p>در زبان Kisi در گینه، بخش قابل توجهی از تفاوت‌های زمان و نمود فعل می‌تواند با آهنگ صدا (tone) بیان شود، بدون اینکه چیزی به کلمه اضافه شود. مثلاً: <span class="example">cìmbù</span> («او معمولاً می‌رود») در مقابل <span class="example">cìmbú</span> («او رفت»). تفاوت اصلی در زیر و بمی آخرین بخش کلمه است.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۱۰. هاوایی: یک کلمه جداگانه برای جمع</div>
+        <p>در زبان هاوایی (Hawaiian) می‌توان از واژهٔ <span class="example">mau</span> پیش از اسم برای نشان دادن جمع استفاده کرد، بدون اینکه خود اسم تغییر کند. مثلاً: <span class="example">iʻa = ماهی</span> و <span class="example">mau iʻa = ماهی‌ها</span>.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۱۱. ژاپنی: استفاده از ذرات (Particles) به جای ترتیب یا تغییر شکل</div>
+        <p>در ژاپنی، نقش دستوری کلمات (مثل فاعل یا مفعول) اغلب با تغییر شکل خود کلمه یا ترتیب آن‌ها مشخص نمی‌شود، بلکه با اضافه کردن ذرات کوچکی بعد از کلمه تعیین می‌گردد. مثلاً ذرهٔ <span class="example">は (wa)</span> فاعل را و ذرهٔ <span class="example">を (o)</span> مفعول را مشخص می‌کند. این به زبان اجازه می‌دهد ترتیب کلمات در جمله تا حد زیادی انعطاف‌پذیر باشد.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-eyebrow" style="margin-bottom:10px;">۱۲. گرجی: هم‌گذاری چندگانه در فعل (Polypersonal agreement)</div>
+        <p>در زبان گرجی، فعل می‌تواند همزمان اطلاعات مربوط به فاعل، مفعول مستقیم و حتی مفعول غیرمستقیم را در خود جای دهد. برای مثال، یک فعل واحد می‌تواند به تنهایی معنای کل جملهٔ «من آن را به تو می‌دهم» را برساند، بدون اینکه نیازی به آوردن ضمایر جداگانه باشد. این سطح از فشرده‌سازی اطلاعات در یک کلمه، در بسیاری از زبان‌های دنیا نادر است.</p>
+      </div>`;
+  }
+
+  function deepFilled(v){
+    if(Array.isArray(v)) return v.some(deepFilled);
+    if(v && typeof v==='object') return Object.values(v).some(deepFilled);
+    if(typeof v==='boolean') return v;
+    return v!=null && String(v).trim().length>0;
+  }
+  function renderSummary(){
+    const s = STATE;
+    let html = `<div class="summary-card" id="summaryText">`;
+
+    html += `<h3>استیت ۱ — دنیای زبان</h3>`;
+    html += deepFilled(s.state1) ? `
+      <p>موجودات گویشور: ${escapeHtml(s.state1.beings||'—')}</p>
+      <p>مکان و زمان: ${escapeHtml(s.state1.place||'—')}</p>
+      <p>باورها: ${escapeHtml(s.state1.beliefs||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده — به استیت ۱ بروید.</p>`;
+
+    html += `<h3>استیت ۲ — الفبا</h3>`;
+    html += deepFilled(s.state2) ? `
+      <p>مجموعه‌حروف: ${escapeHtml(s.state2.alphabetChoice||'—')}</p>
+      <p>حروف حذف‌شده: ${escapeHtml(s.state2.removed||'—')}</p>
+      <p>نماد جدید: ${escapeHtml(s.state2.added||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده — به استیت ۲ بروید.</p>`;
+
+    html += `<h3>استیت ۳ — کلمات اصلی</h3>`;
+    const filledWords = s.state3.words.filter(w=>w.concept||w.word);
+    html += filledWords.length ? `<p>${filledWords.map(w=>escapeHtml((w.concept||'؟')+' = '+(w.word||'؟'))).join(' · ')}</p>` : `<p class="empty">هنوز کلمه‌ای ثبت نشده — به استیت ۳ بروید.</p>`;
+
+    html += `<h3>استیت ۴ — ساخت کلمات</h3>`;
+    html += deepFilled(s.state4) ? `
+      <p>روش ساخت کلمه: ${escapeHtml(s.state4.method||'—')}</p>
+      <p>نمونه: ${escapeHtml(s.state4.baseWord||'—')} ← جمع: ${escapeHtml(s.state4.pluralForm||'—')} · منفی: ${escapeHtml(s.state4.negForm||'—')} · گذشته: ${escapeHtml(s.state4.pastForm||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده — به استیت ۴ بروید.</p>`;
+
+    html += `<h3>استیت ۵ — گرامر</h3>`;
+    const orderLabel = {SOV:'فاعل–مفعول–فعل',SVO:'فاعل–فعل–مفعول',OSV:'مفعول–فاعل–فعل',OVS:'مفعول–فعل–فاعل',VSO:'فعل–فاعل–مفعول',VOS:'فعل–مفعول–فاعل',other:s.state5.structure.customOrder}[s.state5.structure.order];
+    html += orderLabel ? `<p>ترتیب جمله: ${escapeHtml(orderLabel)}</p>` : `<p class="empty">ترتیب جمله هنوز مشخص نشده.</p>`;
+    if(s.state5.time.sys.length) html += `<p>تمایز زمانی: ${escapeHtml(s.state5.time.sys.join('، '))}</p>`;
+    if(s.state5.number.has) html += `<p>مفرد/جمع: ${s.state5.number.has==='yes'?'دارد':'ندارد'}</p>`;
+    if(s.state5.gender.has) html += `<p>جنسیت دستوری: ${s.state5.gender.has==='yes'?'دارد':'ندارد'}</p>`;
+    if(s.state5.negation.positive||s.state5.negation.negative) html += `<p>منفی‌سازی: ${escapeHtml(s.state5.negation.positive||'—')} ← ${escapeHtml(s.state5.negation.negative||'—')}</p>`;
+
+    html += `<h3>ایده: سیستم شمارش</h3>`;
+    html += deepFilled(s.counting) ? `
+      <p>مبنا: ${escapeHtml(s.counting.baseChoice==='other'?s.counting.customBase:s.counting.baseChoice||'—')}</p>
+      <p>ارزش مکانی: ${s.counting.positional==='yes'?'دارد':(s.counting.positional==='no'?'ندارد (افزایشی)':'—')}</p>
+      <p>صفر: ${s.counting.hasZero==='yes'?('دارد ('+escapeHtml(s.counting.zeroSymbol||'')+')'):(s.counting.hasZero==='no'?'ندارد':'—')}</p>
+      <p>نام سیستم: ${escapeHtml(s.counting.sysName||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده.</p>`;
+
+    html += `<h3>ایده: تقویم</h3>`;
+    html += deepFilled(s.calendar) ? `
+      <p>روز/ماه/سال: ${escapeHtml(s.calendar.dayDef||'—')} / ${escapeHtml(s.calendar.monthDef||'—')} / ${escapeHtml(s.calendar.yearDef||'—')}</p>
+      <p>ماه‌ها: ${escapeHtml(s.calendar.monthNames||'—')}</p>
+      <p>جشن‌ها: ${escapeHtml(s.calendar.festivals||'—')}</p>` : `<p class="empty">هنوز تکمیل نشده.</p>`;
+
+    html += `<h3>پیوست‌ها</h3>`;
+    html += `<p>برای مشاهدهٔ جداول زبان‌های باستانی ایران و الگوهای تحول واژگان در زبان‌های دنیا، به بخش‌های «پیوست ۱» و «پیوست ۲» در منوی کناری مراجعه کنید.</p>`;
+
+    html += `<button class="copy-btn" id="copySummary">کپی کردن خلاصه</button></div>`;
+    return html;
+  }
+
+  function topLabel(id){ return TOP.find(t=>t.id===id); }
+  function isTopFilled(id){
+    if(id==='summary') return false;
+    return deepFilled(STATE[id]);
+  }
+  function overallProgress(){
+    const real = TOP.filter(t=>t.id!=='summary');
+    const filled = real.filter(t=>isTopFilled(t.id)).length;
+    return Math.round((filled/real.length)*100);
+  }
+  function toFaDigits(n){
+    const map={'0':'۰','1':'۱','2':'۲','3':'۳','4':'۴','5':'۵','6':'۶','7':'۷','8':'۸','9':'۹'};
+    return String(n).replace(/[0-9]/g,d=>map[d]);
+  }
+
+  function renderRail(){
+    const cur = FLOW[flowIndex];
+    const rail = document.getElementById('rail');
+    rail.innerHTML = TOP.map(t=>`
+      <div class="rail-item ${t.id===cur.top?'active':''} ${isTopFilled(t.id)?'filled':''}" data-goto="${t.id}">
+        <span class="rail-num">${t.num}</span><span>${t.label}</span>
+      </div>`).join('');
+    rail.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click', ()=>gotoTop(el.dataset.goto)));
+
+    const tabs = document.getElementById('mobileTabs');
+    tabs.innerHTML = TOP.map(t=>`<div class="mobile-tab ${t.id===cur.top?'active':''}" data-goto="${t.id}">${t.num}. ${t.label}</div>`).join('');
+    tabs.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click', ()=>gotoTop(el.dataset.goto)));
+  }
+  function gotoTop(id){
+    const i = FLOW.findIndex(f=>f.top===id);
+    flowIndex = i>=0?i:0;
+    renderAll();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  function updateProgress(){
+    const pct = overallProgress();
+    document.getElementById('progressFill').style.width = pct+'%';
+    document.getElementById('progressLabel').textContent = toFaDigits(pct)+'٪';
+  }
+
+  const TOP_RENDERERS = {
+    state1:renderState1, state2:renderState2, state3:renderState3, state4:renderState4,
+    counting:renderCounting, calendar:renderCalendar, 
+    appendix1:renderAppendix1, appendix2:renderAppendix2,
+    summary:renderSummary
+  };
+
+  function renderStage(){
+    const cur = FLOW[flowIndex];
+    const meta = topLabel(cur.top);
+    const stage = document.getElementById('stage');
+    let bodyHtml;
+    if(cur.top==='state5'){
+      bodyHtml = renderState5(cur.sub);
+    } else {
+      bodyHtml = TOP_RENDERERS[cur.top]();
+    }
+    const posLabel = `مرحلهٔ ${toFaDigits(flowIndex+1)} از ${toFaDigits(FLOW.length)}`;
+    stage.innerHTML = `
+      <div class="section-head">
+        <div class="section-eyebrow">${posLabel}</div>
+        <h2 class="section-title">${meta.label}${cur.sub?' — '+GRAMMAR_SUB.find(g=>g.id===cur.sub).label:''}</h2>
+      </div>
+      ${bodyHtml}
+      <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn" ${flowIndex===0?'disabled':''}>→ قبلی</button>
+        <button class="nav-btn primary" id="nextBtn" ${flowIndex===FLOW.length-1?'disabled':''}>${flowIndex===FLOW.length-1?'پایان':'بعدی ←'}</button>
+      </div>`;
+    wireStage(stage);
+  }
+
+  function wireStage(stage){
+    stage.querySelectorAll('input[data-field], textarea[data-field]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        setPath(STATE, el.dataset.field, el.value);
+        saveDebounced(); updateProgress(); renderRail();
+      });
+      if(el.dataset.resize==='true'){
+        el.addEventListener('change', ()=>renderStage());
+      }
+    });
+    stage.querySelectorAll('[data-toggle]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const path = el.dataset.toggle, val = el.dataset.value;
+        const curVal = getPath(STATE, path);
+        setPath(STATE, path, curVal===val ? '' : val);
+        saveDebounced(); renderStage(); updateProgress(); renderRail();
+      });
+    });
+    stage.querySelectorAll('[data-multitoggle]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const path = el.dataset.multitoggle, val = el.dataset.value;
+        const arr = getPath(STATE, path);
+        const i = arr.indexOf(val);
+        if(i===-1) arr.push(val); else arr.splice(i,1);
+        saveDebounced(); renderStage(); updateProgress(); renderRail();
+      });
+    });
+    stage.querySelectorAll('[data-check]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const path = el.dataset.check;
+        setPath(STATE, path, !getPath(STATE, path));
+        saveDebounced(); renderStage(); updateProgress(); renderRail();
+      });
+    });
+    stage.querySelectorAll('[data-s5goto]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const idx = FLOW.findIndex(f=>f.top==='state5' && f.sub===el.dataset.s5goto);
+        if(idx>=0){ flowIndex = idx; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
+      });
+    });
+    const prev = document.getElementById('prevBtn');
+    const next = document.getElementById('nextBtn');
+    if(prev) prev.addEventListener('click', ()=>{ if(flowIndex>0){ flowIndex--; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); } });
+    if(next) next.addEventListener('click', ()=>{ if(flowIndex<FLOW.length-1){ flowIndex++; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); } });
+
+    const copyBtn = document.getElementById('copySummary');
+    if(copyBtn){
+      copyBtn.addEventListener('click', async ()=>{
+        const text = document.getElementById('summaryText').innerText;
+        try{ await navigator.clipboard.writeText(text); copyBtn.textContent='کپی شد ✓'; setTimeout(()=>copyBtn.textContent='کپی کردن خلاصه',1400); }
+        catch(e){ copyBtn.textContent='کپی نشد'; }
+      });
+    }
+  }
+
+  function renderAll(){ renderRail(); renderStage(); updateProgress(); }
+
+  document.getElementById('resetBtn').addEventListener('click', async ()=>{
+    if(!confirm('همهٔ پاسخ‌های این کارگاه پاک شود؟ این کار قابل بازگشت نیست.')) return;
+    STATE = defaultState();
+    try{ await window.storage.delete(STORAGE_KEY, false); }catch(e){}
+    flowIndex = 0;
+    renderAll();
+  });
+
+  (async function init(){
+    await load();
+    renderAll();
+  })();
+
+})();
+</script>
+</body>
+</html>

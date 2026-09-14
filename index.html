@@ -1,807 +1,322 @@
-<!doctype html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>کارگاه زبان‌سازی — رویداد رستا</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
-  :root{
-    --bg: #131f28;
-    --bg-panel: #1a2933;
-    --bg-panel-raised: #21333f;
-    --bg-input: #0f1922;
-    --ink: #ece3cf;
-    --ink-dim: #93a6ae;
-    --ink-faint: #62747c;
-    --gold: #d3a24c;
-    --gold-dim: #7c6535;
-    --teal: #6fada0;
-    --brick: #bd6249;
-    --line: #2a3c47;
-    --line-soft: #223038;
-    --font-main: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);color:var(--ink);font-family:var(--font-main);
-    line-height:1.8;-webkit-font-smoothing:antialiased;
-  }
-  .app{max-width:1180px;margin:0 auto;padding:0 0 80px;}
+% !TeX program = xelatex
+\documentclass[12pt,a4paper]{article}
+\input{../Cover/style.tex}
+\usepackage{pgffor}
+\usepackage{xurl}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
 
-  .topbar{
-    display:flex;align-items:center;justify-content:space-between;gap:24px;
-    padding:20px 26px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;
-  }
-  .brand{display:flex;align-items:baseline;gap:12px;}
-  .brand-mark{font-size:28px;color:var(--gold);line-height:1;}
-  .brand h1{font-weight:700;font-size:20px;margin:0;color:var(--ink);}
-  .brand .sub{font-size:12.5px;color:var(--ink-faint);margin-top:3px;}
-  .progress-wrap{display:flex;align-items:center;gap:10px;min-width:220px;}
-  .progress-track{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden;}
-  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));width:0%;transition:width .4s ease;}
-  #progressLabel{font-size:12px;color:var(--ink-dim);white-space:nowrap;}
-  .reset-btn{background:none;border:1px solid var(--line);color:var(--ink-faint);font-size:11.5px;padding:6px 10px;border-radius:5px;cursor:pointer;font-family:var(--font-main);}
-  .reset-btn:hover{color:var(--brick);border-color:var(--brick);}
+\newcommand{\writelines}[1]{%
+  \par\vspace{2mm}
+  \foreach \n in {1,...,#1}{\textcolor{RastaGray}{\rule{\linewidth}{.4pt}}\\[6mm]}}
 
-  .layout{display:flex;gap:0;align-items:flex-start;}
-  .rail{width:260px;flex:none;position:sticky;top:0;padding:18px 22px 40px 10px;border-inline-start:1px solid var(--line);max-height:100vh;overflow-y:auto;}
-  .rail-item{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:6px;cursor:pointer;color:var(--ink-dim);font-size:13.5px;margin-bottom:2px;transition:background .15s ease,color .15s ease;}
-  .rail-item:hover{background:var(--bg-panel);color:var(--ink);}
-  .rail-item.active{background:var(--bg-panel-raised);color:var(--gold);}
-  .rail-num{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;border:1px solid var(--line-soft);color:var(--ink-faint);}
-  .rail-item.active .rail-num{border-color:var(--gold);color:var(--gold);}
-  .rail-item.filled .rail-num{background:var(--gold-dim);color:var(--bg);border-color:var(--gold-dim);}
-  .rail-item.active.filled .rail-num{background:var(--gold);color:var(--bg);border-color:var(--gold);}
-  
-  .stage{flex:1;min-width:0;padding:30px 40px 40px;}
-  .section-head{margin-bottom:20px;}
-  .section-eyebrow{font-size:12px;color:var(--ink-faint);}
-  .section-title{font-size:24px;font-weight:700;margin:4px 0 0;color:var(--ink);}
+\newcommand{\linkfootnote}[2]{%
+  \href{#1}{#2}\footnote{\lr{\url{#1}}}%
+}
 
-  .subnav{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:22px;}
-  .subnav-item{padding:6px 13px;border-radius:16px;border:1px solid var(--line);color:var(--ink-dim);font-size:12.5px;cursor:pointer;}
-  .subnav-item:hover{border-color:var(--gold-dim);color:var(--ink);}
-  .subnav-item.active{background:var(--gold-dim);border-color:var(--gold-dim);color:var(--bg);font-weight:600;}
-  .subnav-item.filled::after{content:" ●";font-size:8px;color:var(--gold);}
+\begin{document}
+\rastaheader
 
-  .guide{background:var(--bg-panel);border:1px solid var(--line);border-inline-start:3px solid var(--gold-dim);border-radius:4px;padding:14px 18px;margin-bottom:22px;font-size:14px;color:var(--ink-dim);}
-  .guide p{margin:0 0 8px;}
-  .guide p:last-child{margin-bottom:0;}
-  .guide .example{color:var(--teal);}
-  .guide strong{color:var(--ink);}
-  .guide ul{margin:8px 0;padding-right:20px;}
-  .guide li{margin-bottom:6px;}
+\section*{سفر به دنیای خلق زبان}
+\begin{center}
+\large جمع علمی-ترویجی رستا \quad | \quad رویداد تابستانه ۱۴۰۵ \quad | \quad سوالات اتاق فکر
+\end{center}
 
-  .card{background:var(--bg-panel);border:1px solid var(--line);border-radius:6px;padding:20px 22px;margin-bottom:18px;}
-  .field{margin-bottom:16px;}
-  .field:last-child{margin-bottom:0;}
-  .field label{display:block;font-size:12.5px;color:var(--ink-dim);margin-bottom:6px;}
-  .field .hint{font-size:11.5px;color:var(--ink-faint);margin-top:5px;}
-  input[type=text], textarea{width:100%;background:var(--bg-input);border:1px solid var(--line);border-radius:5px;color:var(--ink);padding:9px 11px;font-family:var(--font-main);font-size:13.5px;resize:vertical;}
-  input[type=text]:focus, textarea:focus{outline:none;border-color:var(--gold-dim);}
-  textarea{min-height:56px;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-  @media (max-width:640px){.row2,.row3{grid-template-columns:1fr;}}
+\vspace{5mm}
+\section{رستایی عزیز، سلام!}
 
-  .toggle-group{display:flex;flex-wrap:wrap;gap:8px;}
-  .toggle-btn{background:var(--bg-input);border:1px solid var(--line);color:var(--ink-dim);padding:8px 14px;border-radius:20px;font-size:13px;cursor:pointer;font-family:var(--font-main);transition:all .15s ease;}
-  .toggle-btn:hover{border-color:var(--gold-dim);color:var(--ink);}
-  .toggle-btn.active{background:var(--gold-dim);border-color:var(--gold-dim);color:var(--bg);font-weight:600;}
-  .toggle-btn.active.teal{background:var(--teal);border-color:var(--teal);}
+به کارگاه زبان‌سازی خوش آمدید. شما قرار است به عنوان یک گروه مستقل و جدید وارد بازار رستا شوید. اما یک مشکل وجود دارد: \textbf{هیچ تمدنی بدون زبان نمی‌تواند هویت مستقلی داشته باشد.}
 
-  .check-row{display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer;font-size:13.5px;color:var(--ink-dim);}
-  .check-row:last-child{margin-bottom:0;}
-  .check-box{width:17px;height:17px;border-radius:4px;border:1px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;background:var(--bg-input);font-size:11px;color:var(--bg);}
-  .check-box.active{background:var(--teal);border-color:var(--teal);}
+شما با هزاغ‌هایی با نشانه‌های ناشناخته و گروه‌هایی روبرو هستید که هر کدام به شیوه‌ای با یکدیگر ارتباط برقرار می‌کنند؛ برخی با حرکت بدن، برخی با نور و برخی با صدا. در واقع هر گروه با ویژگی‌های خاص خود، در این دنیای عظیم و شلوغ بازار زندگی می‌کند و قوانین و توانایی‌های خاص خود را دارد. 
 
-  .conditional{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);}
+شما برای بار اول وارد بازار می‌شوید و هویت رسمی شما به عنوان یک داژن (گروه) مستقل ثبت نشده است. شما نه نامی دارید، نه زبانی شخصی و نه نشانی. اما برای اینکه به عنوان یک داژن مستقل شناخته شوید، باید هویت خود را بسازید. شما می‌توانید هر چیزی باشید: یک تمدن نیمه‌شفاف، یک گروه از تبارها، یا موجودیتی که تاکنون در این دنیا دیده نشده است.
 
-  .wordgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px;}
-  @media (max-width:900px){.wordgrid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:560px){.wordgrid{grid-template-columns:1fr;}}
-  .word-row{background:var(--bg-input);border:1px solid var(--line);border-radius:6px;padding:9px 10px;}
-  .word-row .idx{font-size:10.5px;color:var(--ink-faint);margin-bottom:4px;}
-  .word-row input{margin-bottom:6px;}
-  .word-row input:last-child{margin-bottom:0;}
+اما یک مشکل وجود دارد: \textbf{هیچ داژنی بدون زبان نمی‌تواند هویت مستقل داشته باشد.}
 
-  .nav-buttons{display:flex;justify-content:space-between;margin-top:28px;}
-  .nav-btn{background:none;border:1px solid var(--line);color:var(--ink-dim);padding:10px 18px;border-radius:5px;cursor:pointer;font-size:13.5px;font-family:var(--font-main);}
-  .nav-btn:hover{border-color:var(--gold);color:var(--gold);}
-  .nav-btn.primary{background:var(--gold-dim);border-color:var(--gold-dim);color:var(--bg);font-weight:600;}
-  .nav-btn.primary:hover{background:var(--gold);border-color:var(--gold);color:var(--bg);}
-  .nav-btn:disabled{opacity:.3;cursor:default;}
-  .nav-btn:disabled:hover{border-color:var(--line);color:var(--ink-dim);}
+ماموریت شما این است که زبان مخصوص داژن خود را طراحی کنید. زبانی که دیگران بتوانند با شما ارتباط برقرار کنند و شما را بشناسند. قرار نیست فقط چند کلمه عجیب و غریب اختراع کنید؛ بلکه باید تصمیم بگیرید مفاهیم چگونه بیان می‌شوند، واژه‌ها چگونه ساخته می‌شوند و شنوندگان چه چیزی را مهم می‌دانند. در نهایت، شما نه فقط یک داژن جدید، بلکه زبانی خواهید داشت که بخشی از فرهنگ، تاریخ و نگاه شنوندگان به جهان را در خود نشان می‌دهد.
 
-  .summary-card{background:var(--bg-panel);border:1px solid var(--gold-dim);border-radius:6px;padding:26px 30px;}
-  .summary-card h3{font-size:15px;color:var(--gold);margin:22px 0 8px;font-weight:700;padding-bottom:6px;border-bottom:1px solid var(--line-soft);}
-  .summary-card h3:first-child{margin-top:0;}
-  .summary-card p{margin:4px 0;font-size:14.5px;color:var(--ink);line-height:1.8;}
-  .summary-card .empty{color:var(--ink-faint);font-style:italic;}
-  .copy-btn{margin-top:18px;background:none;border:1px solid var(--gold-dim);color:var(--gold);padding:8px 16px;border-radius:5px;cursor:pointer;font-size:13px;font-family:var(--font-main);}
-  .copy-btn:hover{background:var(--gold-dim);color:var(--bg);}
+\begin{center}
+\setlength{\fboxsep}{9pt}
+\colorbox{RastaPale}{%
+\begin{minipage}{.91\textwidth}
+\textbf{قوانین طلایی زبان‌سازی:}
+\begin{enumerate}
+    \item \textbf{زبان شما نباید رمزگذاری یک زبان موجود باشد:} جایگزینی ساده حروف، برعکس کردن کلمات، یا تعیین یک معادل جدید برای تک‌تک کلمات یک زبان موجود قابل قبول نیست. زبان شما باید یک سیستم جدید باشد.
+    \item \textbf{برای تصمیمات مهم خود دلیل داشته باشید:} چرا ترتیب جمله این‌گونه است؟ چرا این صداها انتخاب شده‌اند؟ دلایل شما می‌تواند زیست‌محیطی، تاریخی، اجتماعی یا کاملاً خیالی باشد، اما باید وجود داشته باشد.
+    \item \textbf{زبان شما باید زایا باشد:} زبان شما نباید فقط مجموعه‌ای از جملات حفظ‌شده باشد. باید قوانینی داشته باشد که با استفاده از آن‌ها بتوان جملات جدید و بی‌نهایتی ساخت که قبلاً به شما آموزش داده نشده‌اند.
+\end{enumerate}
+\end{minipage}}
+\end{center}
 
-  .mobile-tabs{display:none;}
-  @media (max-width:860px){
-    .rail{display:none;}
-    .mobile-tabs{display:flex;overflow-x:auto;gap:6px;padding:14px 16px;border-bottom:1px solid var(--line);}
-    .mobile-tab{flex:none;padding:7px 13px;border-radius:16px;border:1px solid var(--line);color:var(--ink-dim);font-size:12.5px;white-space:nowrap;cursor:pointer;}
-    .mobile-tab.active{background:var(--gold-dim);color:var(--bg);border-color:var(--gold-dim);}
-    .stage{padding:22px 18px 40px;}
-  }
-  .saved-flag{position:fixed;bottom:18px;left:22px;background:var(--bg-panel-raised);border:1px solid var(--gold-dim);color:var(--gold);font-size:12px;padding:8px 14px;border-radius:5px;opacity:0;transition:opacity .3s ease;pointer-events:none;}
-  .saved-flag.show{opacity:1;}
-</style>
-</head>
-<body>
-<div class="app">
-  <div class="topbar">
-    <div class="brand">
-      <span class="brand-mark">§</span>
-      <div>
-        <h1>کارگاه زبان‌سازی</h1>
-        <div class="sub">رویداد تابستانه رستا — سفر به دنیای خلق زبان</div>
-      </div>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <span id="progressLabel">۰٪</span>
-      <button class="reset-btn" id="resetBtn">پاک‌سازی همه</button>
-    </div>
-  </div>
+% =====================================================================
+\newpage
+\section*{گام اول: دنیای زبان خود را مشخص کنید!}
+پیش از ساختن هر کلمه یا قاعده‌ای، باید بدانید این زبان برای چه کسانی و در چه دنیایی ساخته می‌شود. محیط، تاریخ و سبک زندگی شنوندگان می‌تواند روی ساختار زبان‌شان اثر بگذارد.
 
-  <div class="mobile-tabs" id="mobileTabs"></div>
+\subsection*{۱. شنوندگان زبان شما چه موجوداتی هستند؟}
+انسان، تبارها، حیوانات، فرازمینی‌ها یا هر موجود دیگری که تصور می‌کنید. اگر شنوندگان شما موجوداتی هستند که نمی‌توانند صدا تولید کنند، زبان‌شان احتمالاً بر پایه حرکت، نور یا نشانه‌های دیگری خواهد بود.
+\writelines{3}
 
-  <div class="layout">
-    <nav class="rail" id="rail"></nav>
-    <main class="stage" id="stage"></main>
-  </div>
-</div>
-<div class="saved-flag" id="savedFlag">ذخیره شد</div>
+\subsection*{۲. شنوندگان شما کجا و در چه زمانی زندگی می‌کنند؟}
+مکان و دوره زندگی را مشخص کنید. مثلاً اگر موجودات شما در دریا زندگی می‌کنند، احتمالاً واژگان زیادی برای جریان‌های دریایی و انواع آب دارند. یا اگر انسان‌هایی در یک غار باستانی هستند، زبان‌شان تحت تأثیر ابزارها و شیوه زندگی و اتفاقات آن دوره خواهد بود.
+\writelines{3}
 
-<script>
-(function(){
+\subsection*{۳. باورها و ارزش‌های شنوندگان شما چیست؟}
+ارزش‌ها، باورها و هنجارهای مهم جامعه خود را مشخص کنید. مثلاً اگر صداقت در جامعه شما اهمیت بسیار زیادی دارد، ممکن است زبان‌تان روش‌های خاصی برای بیان منبع اطلاعات یا میزان اطمینان از یک گفته داشته باشد. یا اگر افسانه‌های کهن بخشی مهم از فرهنگ شما هستند، ممکن است در اصطلاحات و واژگان زبان بازتاب پیدا کنند.
+\writelines{3}
 
-  const STORAGE_KEY = 'rasta-language-workshop:v1';
+% =====================================================================
+\section*{گام دوم: صدای زبان و شیوه نوشتن}
+حالا که دنیای شنوندگان خود را ساخته‌اید، وقت آن است که به زبان خود فکر کنید. زبان فقط مجموعه‌ای از کلمات و قوانین نیست؛ بلکه تجربه‌ای حسی است که ممکن است هنگام شنیدن یا دیدن آن ایجاد شود.
 
-  const TOP = [
-    {id:'intro', num:'۰', label:'مقدمه و قوانین'},
-    {id:'state1', num:'۱', label:'دنیای زبان'},
-    {id:'state2', num:'۲', label:'آوا و خط'},
-    {id:'state3', num:'۳', label:'ساختار جمله'},
-    {id:'state4', num:'۴', label:'واژگان پایه'},
-    {id:'state5', num:'۵', label:'ساخت واژه جدید'},
-    {id:'state6', num:'۶', label:'آزمون زبان'},
-    {id:'advanced', num:'۷', label:'چالش پیشرفته'},
-    {id:'summary', num:'✓', label:'خلاصهٔ نهایی'}
-  ];
+\subsection*{۱. زبان شما چه حسی را منتقل می‌کند؟}
+اگر کسی برای اولین بار زبان شما را بشنود یا نوشته آن را ببیند، چه حسی پیدا می‌کند؟ آیا باید خشن و قدرتمند باشد؟ آرام و موسیقیایی؟ قدیمی و باستانی؟ یا مدرن و ناشناخته؟ ویژگی‌هایی را برای ظاهر و صدای زبان خود انتخاب و دلیل آن را با توجه به دنیایی که ساخته‌اید توضیح دهید.
+\writelines{3}
 
-  const GRAMMAR_SUB = [
-    {id:'evidentiality', label:'چه چیزی باید گفته شود؟'},
-    {id:'order', label:'ترتیب کلمات'},
-    {id:'time', label:'زمان'},
-    {id:'number', label:'تعداد (مفرد/جمع)'},
-    {id:'gender', label:'جنسیت/دسته‌بندی'},
-    {id:'negation', label:'منفی‌سازی'},
-    {id:'questions', label:'پرسشی‌سازی'}
-  ];
+\subsection*{۲. چه صداها یا نشانه‌هایی این حس را ایجاد می‌کنند؟}
+حالا فکر کنید برای ایجاد چنین حسی به چه صداهایی نیاز دارید. مثلاً صداهای کوتاه و انفجاری می‌توانند به زبان حس خشن و قدرتمند بدهند، در حالی که تکرار صداها یا ترکیبات غیرمعمول می‌توانند حس موسیقیایی یا ناشناخته‌تری ایجاد کنند.
+\writelines{3}
 
-  const FLOW = [
-    {top:'intro'}, {top:'state1'}, {top:'state2'}, 
-    ...GRAMMAR_SUB.map(g=>({top:'state3', sub:g.id})),
-    {top:'state4'}, {top:'state5'}, {top:'state6'}, {top:'advanced'}, {top:'summary'}
-  ];
+\subsection*{۳. زبان خود را شخصی‌سازی کنید}
+مجموعه‌ای که انتخاب کرده‌اید را بررسی کنید. آیا برای هماهنگی بهتر با دنیای شنوندگان، نیاز است برخی صداها یا نشانه‌ها را حذف یا تغییر دهید؟ یا شاید لازم باشد نشانه‌ای کاملاً جدید طراحی کنید؟ تغییرات خود را توضیح دهید.
+\writelines{3}
 
-  function emptyWords(n){ return Array.from({length:n}, ()=>({concept:'', word:'', reason:''})); }
+% =====================================================================
+\newpage
+\section*{گام سوم: زبان چگونه جمله می‌سازد؟}
+اکنون که می‌دانید زبان شما چه صدایی دارد و از چه نشانه‌هایی استفاده می‌کند، باید تصمیم بگیرید که این زبان چگونه کار می‌کند. در ادامه ویژگی‌های زبان‌های مختلف دنیا را مرور کنید و ببینید کدام یک با دنیایی که ساخته‌اید سازگارتر است.
 
-  function defaultState(){
-    return {
-      intro:{read:true},
-      state1:{beings:'', place:'', beliefs:''},
-      state2:{sense:'', sounds:'', personalization:''},
-      state3:{
-        evidentiality:{explain:'', example:''},
-        order:{order:'', customOrder:'', why:'', changes:'', changeExample:'', markingMethod:''},
-        time:{sys:[], customSys:'', verb:'', present:'', past:'', future:'', method:'', methodExplain:''},
-        number:{has:'', singNoun:'', pluralNoun:'', verbChanges:false, adjChanges:false, pronounChanges:false, sentSing:'', sentPlur:'', why:''},
-        gender:{has:'', nouns:false, pronouns:false, adjectives:false, verbs:false, heForm:'', sheForm:'', theyForm:''},
-        negation:{method:'', explain:'', positive:'', negative:''},
-        questions:{method:'', explain:'', statement:'', question:''}
-      },
-      state4:{words: emptyWords(15)},
-      state5:{
-        number:{base:'', plural:'', rule:''},
-        gender:{base:'', form2:'', rule:''},
-        negation:{base:'', negative:'', rule:''},
-        derivation:{base:'', derived:'', meaning:'', rule:''}
-      },
-      state6:{
-        simple:'', simpleFa:'',
-        timeNum:'', timeNumFa:'',
-        negative:'', negativeFa:'',
-        question:'', questionFa:'',
-        rastaMsg:'', rastaMsgFa:''
-      },
-      advanced:{
-        choice:'', // 'calendar' or 'counting'
-        calendar:{dayDef:'', monthDef:'', yearDef:'', basis:'', yearLength:'', monthsCount:'', extraDays:'', monthNames:'', festivals:''},
-        counting:{noNumberMethod:'', grouping:'', base:'', symbols: Array(10).fill(''), combineRule:'', zeroExplain:'', math1:'', math2:'', math3:''}
-      }
-    };
-  }
+\subsection*{۱. چه چیزهایی باید در جمله گفته شود؟}
+زبان‌ها مجبور نیستند همه اطلاعات را به یک شکل منتقل کنند. فکر کنید شنوندگان شما هنگام صحبت کردن، چه تفاوت‌هایی را لازم است حتماً مشخص کنند. 
+مثلاً در زبان فارسی تفاوت «من این اتفاق را دیدم» و «من شنیدم که این اتفاق افتاده» با افزودن کلمات جداگانه مشخص می‌شود، اما در برخی زبان‌ها این تفاوت با تغییر شکل فعل به صورت اجباری بیان می‌شود. یا اگر سلسله‌مراتب اجتماعی در جامعه شما بسیار مهم است، ممکن است زبان‌تان هنگام صحبت با یک فرمانروا در مقایسه با صحبت با یک هم‌رده، تفاوت‌های ساختاری زیادی داشته باشد.
+حداقل دو ویژگی را که فکر می‌کنید در زبان شما اهمیت ویژه‌ای دارد انتخاب کرده و توضیح دهید چرا و چگونه در زبان نشان داده می‌شوند.
+\writelines{4}
 
-  let STATE = defaultState();
-  let flowIndex = 0;
-  let saveTimer = null;
+\subsection*{۲. ترتیب کلمات}
+ترتیب پایه‌ای جمله در زبان شما چیست؟ (مثلاً: فاعل--مفعول--فعل، یا فاعل--فعل--مفعول، یا مفعول--فعل--فاعل و...). چرا این ترتیب را انتخاب کردید؟ آیا تغییر این ترتیب معنا را عوض می‌کند؟ اگر نه، شنونده چگونه فاعل را از مفعول تشخیص می‌دهد؟
+\writelines{4}
 
-  function escapeHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function getPath(o,p){ return p.split('.').reduce((a,k)=>(a==null?a:a[k]),o); }
-  function setPath(o,p,v){ const k=p.split('.'); let a=o; for(let i=0;i<k.length-1;i++)a=a[k[i]]; a[k[k.length-1]]=v; }
+\subsection*{۳. زمان}
+آیا بین گذشته، حال و آینده تفاوت قائل می‌شوید؟ با توجه به دنیایی که ساخته‌اید، شاید تمایزهای زمانی دیگری (مثل قبل و بعد از یک رویداد مهم طبیعی) برای شنوندگان شما مهم‌تر از گذشته و آینده معمولی باشد. این تفاوت‌ها چگونه ایجاد می‌شوند؟ (تغییر فعل، واژه جداگانه، تغییر ترتیب و...)
+\writelines{4}
 
-  function flashSaved(){
-    const el = document.getElementById('savedFlag');
-    el.classList.add('show'); clearTimeout(el._t);
-    el._t = setTimeout(()=>el.classList.remove('show'), 900);
-  }
-  async function save(){
-    try{ const res = await window.storage.set(STORAGE_KEY, JSON.stringify(STATE), false); if(res) flashSaved(); }
-    catch(e){ console.error('save failed', e); }
-  }
-  function saveDebounced(){ clearTimeout(saveTimer); saveTimer=setTimeout(save,500); }
-  async function load(){
-    try{
-      const res = await window.storage.get(STORAGE_KEY, false);
-      if(res && res.value){
-        const parsed = JSON.parse(res.value);
-        const def = defaultState();
-        Object.keys(def).forEach(k=>{
-          if(parsed[k]===undefined) return;
-          if(k==='state3'){
-            Object.keys(def.state3).forEach(sk=>{ def.state3[sk] = Object.assign(def.state3[sk], parsed.state3 && parsed.state3[sk] || {}); });
-          } else if(k==='state4'){
-            def.state4.words = (parsed.state4 && parsed.state4.words) ? parsed.state4.words : def.state4.words;
-          } else if(k==='advanced'){
-            def.advanced = Object.assign(def.advanced, parsed.advanced||{});
-          } else {
-            def[k] = Object.assign(def[k], parsed[k]);
-          }
-        });
-        STATE = def;
-      }
-    }catch(e){}
-  }
+\subsection*{۴. تعداد}
+آیا بین مفرد و جمع تفاوت قائل می‌شوید؟ اگر بله، مشخص کنید کدام بخش‌های جمله تحت تأثیر قرار می‌گیرند:
+\begin{itemize}
+    \item آیا اسم‌ها برای جمع تغییر می‌کنند؟
+    \item آیا فعل‌ها برای جمع تغییر می‌کنند؟
+    \item آیا صفت‌ها برای جمع تغییر می‌کنند؟
+    \item آیا ضمایر برای جمع تغییر می‌کنند؟
+\end{itemize}
+\writelines{3}
 
-  function fieldText(path,label,placeholder,hint,extraAttr){
-    const v = getPath(STATE,path)||'';
-    return `<div class="field"><label>${escapeHtml(label)}</label>
-      <input type="text" data-field="${path}" ${extraAttr||''} value="${escapeHtml(v)}" placeholder="${escapeHtml(placeholder||'')}">
-      ${hint?`<div class="hint">${hint}</div>`:''}</div>`;
-  }
-  function fieldArea(path,label,placeholder,hint){
-    const v = getPath(STATE,path)||'';
-    return `<div class="field"><label>${escapeHtml(label)}</label>
-      <textarea data-field="${path}" placeholder="${escapeHtml(placeholder||'')}">${escapeHtml(v)}</textarea>
-      ${hint?`<div class="hint">${hint}</div>`:''}</div>`;
-  }
-  function toggleGroup(path,label,options){
-    const v = getPath(STATE,path)||'';
-    return `<div class="field"><label>${escapeHtml(label)}</label><div class="toggle-group">
-      ${options.map(o=>`<button type="button" class="toggle-btn ${v===o.value?'active':''}" data-toggle="${path}" data-value="${escapeHtml(o.value)}">${escapeHtml(o.text)}</button>`).join('')}
-    </div></div>`;
-  }
-  function checkRow(path,label){
-    const v = !!getPath(STATE,path);
-    return `<div class="check-row" data-check="${path}"><span class="check-box ${v?'active':''}">${v?'✓':''}</span><span>${escapeHtml(label)}</span></div>`;
-  }
+\subsection*{۵. جنسیت یا دسته‌بندی}
+آیا زبان شما بین جنسیت‌های مختلف (یا دسته‌بندی‌های دیگری مثل جاندار/بی‌جان) تفاوت قائل می‌شود؟ اگر بله، مشخص کنید کدام بخش‌ها تغییر می‌کنند (اسم، ضمیر، صفت، فعل).
+\writelines{3}
 
-  function renderIntro(){
-    return `
-      <div class="guide">
-        <p><strong>رستایی عزیز، سلام!</strong><br>به کارگاه زبان‌سازی خوش آمدید. شما قرار است به عنوان یک گروه مستقل و جدید وارد بازار رستا شوید. اما یک مشکل وجود دارد: <strong>هیچ داژنی بدون زبان نمی‌تواند هویت مستقلی داشته باشد.</strong></p>
-        <p>ماموریت شما طراحی زبانی است که دیگران بتوانند با شما ارتباط برقرار کنند و شما را بشناسند.</p>
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:18px;margin-bottom:16px;">قوانین طلایی زبان‌سازی</div>
-        <ul style="padding-right:20px; color:var(--ink-dim);">
-          <li><strong>۱. زبان شما نباید رمزگذاری یک زبان موجود باشد:</strong> جایگزینی سادهٔ حروف، برعکس کردن کلمات، یا تعیین یک معادل جدید برای تک‌تک کلمات یک زبان موجود، قابل قبول نیست. زبان شما باید یک سیستم جدید باشد.</li>
-          <li><strong>۲. برای تصمیمات مهم خود دلیل داشته باشید:</strong> چرا ترتیب جمله این‌گونه است؟ چرا این صداها انتخاب شده‌اند؟ دلایل شما می‌تواند زیست‌محیطی، تاریخی، اجتماعی یا کاملاً خیالی باشد، اما باید وجود داشته باشد.</li>
-          <li><strong>۳. زبان شما باید زایا باشد:</strong> زبان شما نباید فقط مجموعه‌ای از جملات حفظ‌شده باشد. باید قوانینی داشته باشد که با استفاده از آن‌ها بتوان جملات جدید و بی‌نهایتی ساخت که قبلاً به شما آموزش داده نشده‌اند.</li>
-        </ul>
-      </div>`;
-  }
+\subsection*{۶. منفی‌سازی}
+جملات منفی چگونه ساخته می‌شوند؟ آیا واژه یا نشانه‌ای به جمله اضافه می‌شود، شکل فعل تغییر می‌کند، یا ترتیب کلمات عوض می‌شود؟
+\writelines{3}
 
-  function renderState1(){
-    return `
-      <div class="guide">
-        <p><strong>گام اول: دنیای زبان خود را مشخص کنید!</strong><br>پیش از ساختن هر کلمه یا قاعده‌ای، باید بدانید این زبان برای چه کسانی و در چه دنیایی ساخته می‌شود.</p>
-      </div>
-      <div class="card">
-        ${fieldArea('state1.beings','۱. گویشوران زبان شما چه موجوداتی هستند؟','انسان، فرازمینی، حیوان هوشمند، یا موجودی کاملاً متفاوت...')}
-        ${fieldArea('state1.place','۲. کجا و در چه زمانی زندگی می‌کنند؟','محیط زندگی (مثلاً زیر آب، در غار، در فضا) مستقیماً روی دایرهٔ لغات و ساختار زبان اثر می‌گذارد.')}
-        ${fieldArea('state1.beliefs','۳. باورها، ارزش‌ها و نامرآهای گویشوران‌تان چیست؟','اگر صداقت بسیار مهم است، یا سلسله‌مراتب اجتماعی سخت‌گیرانه‌ای دارند، این موضوع در زبانشان بازتاب خواهد یافت.')}
-      </div>`;
-  }
+\subsection*{۷. پرسشی‌سازی}
+چگونه یک جمله خبری را به پرسشی تبدیل می‌کنید؟ (تغییر ترتیب، افزودن واژه/نشانه خاص، تغییر شکل فعل، یا فقط تغییر لحن).
+\writelines{3}
 
-  function renderState2(){
-    return `
-      <div class="guide">
-        <p><strong>گام دوم: آوا و شیوهٔ نوشتن</strong><br>زبان فقط مجموعه‌ای از کلمات نیست؛ بلکه تجربه‌ای حسی است.</p>
-      </div>
-      <div class="card">
-        ${fieldArea('state2.sense','۱. زبان شما چه حسی را منتقل می‌کند؟','آیا صدایی خشن و انفجاری دارد؟ یا آهنگین و کشیده؟ آیا اصلاً بر پایهٔ صدا است یا بر پایهٔ نور، حرکت یا لمس؟')}
-        ${fieldArea('state2.sounds','۲. چه آواها یا نشانه‌هایی این حس را ایجاد می‌کنند؟','مثلاً: صداهای کوتاه و انفجاری برای نشان دادن خشونت، یا تکرار آواها برای ایجاد حس موسیقیایی.')}
-        ${fieldArea('state2.personalization','۳. شخصی‌سازی زبان:','آیا نیاز است برخی آواها یا نشانه‌ها را حذف، اضافه یا تغییر دهید تا با دنیای ساخته‌شده در گام اول هماهنگ‌تر شود؟ (دلیل تغییر را بنویسید)')}
-      </div>`;
-  }
+% =====================================================================
+\newpage
+\section*{گام چهارم: واژگان پایه}
+اکنون که ساختار کلی زبان خود را مشخص کردید، وقت آن است که واژگان پایه آن را بسازید. به دنیایی که ساخته‌اید فکر کنید. شنوندگان شما برای صحبت درباره زندگی روزمره و دنیای اطرافشان به چه واژه‌هایی نیاز دارند؟
 
-  function renderS3Evidentiality(){
-    const s = STATE.state3.evidentiality;
-    return `
-      <div class="guide"><p>زبان‌ها مجبور نیستند همهٔ اطلاعات را یک‌جور منتقل کنند. در برخی زبان‌ها (مثل ترکی یا برخی زبان‌های بومی)، متمایز کردن اینکه «من خودم دیدم اتفاق افتاد» با «من شنیدم که اتفاق افتاد» اجباری است.</p></div>
-      <div class="card">
-        ${fieldArea('state3.evidentiality.explain','آیا در فرهنگ شما منبع اطلاعات (دیدن، شنیدن، حدس زدن) اهمیت دارد؟ چگونه در زبان نشان داده می‌شود؟')}
-        ${fieldText('state3.evidentiality.example','مثال: تفاوت بیان «باران می‌بارد (می‌بینم)» و «باران می‌بارد (شنیده‌ام)»')}
-      </div>`;
-  }
-  function renderS3Order(){
-    const s = STATE.state3.order;
-    return `
-      <div class="guide"><p>سه کلمه به معنای «یک موجود + یک چیز + یک عمل» انتخاب کنید و آن‌ها را بچینید. اگر ترتیب باعث تغییر معنا شود، زبان شما به «ترتیب کلمات» تکیه دارد.</p></div>
-      <div class="card">
-        ${toggleGroup('state3.order.order','ترتیب پیش‌فرض جمله چیست؟', [
-          {value:'SOV',text:'فاعل–مفعول–فعل'},{value:'SVO',text:'فاعل–فعل–مفعول'},
-          {value:'OSV',text:'مفعول–فاعل–فعل'},{value:'OVS',text:'مفعول–فعل–فاعل'},
-          {value:'VSO',text:'فعل–فاعل–مفعول'},{value:'VOS',text:'فعل–مفعول–فاعل'},
-          {value:'other',text:'چیز دیگری'}
-        ])}
-        ${s.order==='other'?`<div class="conditional">${fieldText('state3.order.customOrder','ترتیب خودتان را توصیف کنید')}</div>`:''}
-        ${fieldArea('state3.order.why','چرا این ترتیب را انتخاب کردید؟')}
-        ${toggleGroup('state3.order.changes','آیا جابه‌جایی کلمات معنا را عوض می‌کند؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر'}])}
-        ${s.changes==='yes'?`<div class="conditional">${fieldText('state3.order.changeExample','مثالی از دو ترتیب با دو معنای متفاوت')}</div>`
-          : s.changes==='no'?`<div class="conditional">${fieldText('state3.order.markingMethod','پس شنونده چطور فاعل را از مفعول تشخیص می‌دهد؟ (مثلاً با پسوند فاعلی/مفعولی)')}</div>`:''}
-      </div>`;
-  }
-  function renderS3Time(){
-    const t = STATE.state3.time;
-    const opts=[['present','حال'],['past','گذشته'],['future','آینده'],['custom','سیستمی کاملاً متفاوت']];
-    return `
-      <div class="guide"><p>«من سفر می‌کنم» زمانش مبهم است. تصمیم بگیرید زبان‌تان واقعاً به چه تمایزی نیاز دارد.</p></div>
-      <div class="card">
-        <div class="field"><label>زبان شما چه تمایزهای زمانی دارد؟</label><div class="toggle-group">
-          ${opts.map(([v,txt])=>`<button type="button" class="toggle-btn ${t.sys.includes(v)?'active teal':''}" data-multitoggle="state3.time.sys" data-value="${v}">${txt}</button>`).join('')}
-        </div></div>
-        ${t.sys.includes('custom')?`<div class="conditional">${fieldArea('state3.time.customSys','سیستم زمانی خودتان را توصیف کنید')}</div>`:''}
-        <div class="conditional">
-          <label style="display:block;font-size:12.5px;color:var(--ink-dim);margin-bottom:10px;">یک فعل انتخاب کنید و شکلش را در زمان‌های مختلف بنویسید</label>
-          <div class="row3">
-            ${fieldText('state3.time.verb','فعل پایه')}
-            ${fieldText('state3.time.present','شکل حال')}
-            ${fieldText('state3.time.past','شکل گذشته')}
-          </div>
-          <div style="margin-top:14px;">${fieldText('state3.time.future','شکل آینده')}</div>
-        </div>
-        ${toggleGroup('state3.time.method','این شکل‌ها چطور ساخته می‌شوند؟', [
-          {value:'prefix',text:'پیشوند'},{value:'suffix',text:'پسوند'},{value:'root',text:'تغییر ریشه'},{value:'word',text:'کلمهٔ جداگانه'},{value:'other',text:'روش دیگر'}
-        ])}
-        ${fieldArea('state3.time.methodExplain','توضیح مختصر')}
-      </div>`;
-  }
-  function renderS3Number(){
-    const n = STATE.state3.number;
-    return `
-      <div class="guide"><p>«پرنده پرواز می‌کند» در برابر «پرنده‌ها پرواز می‌کنند». برخی زبان‌ها این را روی اسم نشان می‌دهند، برخی فعل و صفت را هم تغییر می‌دهند.</p></div>
-      <div class="card">
-        ${toggleGroup('state3.number.has','آیا زبان شما مفرد و جمع را از هم جدا می‌کند؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر'}])}
-        ${n.has==='yes' ? `<div class="conditional">
-          <div class="row2">${fieldText('state3.number.singNoun','یک پرنده →')}${fieldText('state3.number.pluralNoun','چند پرنده →')}</div>
-          <div style="margin-top:16px;">
-            ${checkRow('state3.number.verbChanges','فعل هم برای جمع تغییر می‌کند')}
-            ${checkRow('state3.number.adjChanges','صفت هم برای جمع تغییر می‌کند')}
-            ${checkRow('state3.number.pronounChanges','ضمیر هم برای جمع تغییر می‌کند')}
-          </div>
-        </div>` : n.has==='no' ? `<div class="conditional">${fieldArea('state3.number.why','چرا تعداد برای گویشوران شما مهم نیست؟')}</div>` : ''}
-      </div>`;
-  }
-  function renderS3Gender(){
-    const g = STATE.state3.gender;
-    return `
-      <div class="guide"><p>جنسیت دستوری، اسم‌ها را به دسته‌هایی تقسیم می‌کند. کاملاً اختیاری است — بسیاری از زبان‌های دنیا اصلاً آن را ندارند یا به جای جنسیت، دسته‌بندی‌های دیگری (مثل جاندار/بی‌جان) دارند.</p></div>
-      <div class="card">
-        ${toggleGroup('state3.gender.has','آیا زبان شما جنسیت یا دسته‌بندی اسمی دارد؟', [{value:'yes',text:'بله'},{value:'no',text:'خیر / بی‌ربط'}])}
-        ${g.has==='yes' ? `<div class="conditional">
-          ${checkRow('state3.gender.nouns','اسم‌ها دسته‌بندی/جنسیت نشان می‌دهند')}
-          ${checkRow('state3.gender.pronouns','ضمیرها دسته‌بندی/جنسیت نشان می‌دهند')}
-          ${checkRow('state3.gender.adjectives','صفت‌ها برای دسته‌بندی تغییر می‌کنند')}
-          ${checkRow('state3.gender.verbs','فعل‌ها برای دسته‌بندی تغییر می‌کنند')}
-        </div>` : ''}
-      </div>`;
-  }
-  function renderS3Negation(){
-    return `
-      <div class="guide"><p>«من ماهی می‌خورم» چطور به «من ماهی نمی‌خورم» تبدیل می‌شود؟</p></div>
-      <div class="card">
-        ${toggleGroup('state3.negation.method','منفی‌سازی چطور انجام می‌شود؟', [
-          {value:'word',text:'کلمهٔ جداگانه'},{value:'prefix',text:'پیشوند'},{value:'suffix',text:'پسوند'},
-          {value:'verbchange',text:'تغییر فعل'},{value:'order',text:'تغییر ترتیب'},{value:'other',text:'روش دیگر'}
-        ])}
-        ${fieldArea('state3.negation.explain','توضیح مختصر')}
-        <div class="row2">${fieldText('state3.negation.positive','جملهٔ مثبت')}${fieldText('state3.negation.negative','جملهٔ منفی')}</div>
-      </div>`;
-  }
-  function renderS3Questions(){
-    return `
-      <div class="guide"><p>«تو ماهی می‌خوری» → «آیا تو ماهی می‌خوری؟»</p></div>
-      <div class="card">
-        ${toggleGroup('state3.questions.method','سؤالی‌سازی چطور انجام می‌شود؟', [
-          {value:'order',text:'تغییر ترتیب'},{value:'word',text:'نشانهٔ پرسشی'},{value:'verb',text:'تغییر فعل'},
-          {value:'ending',text:'پسوند ویژه'},{value:'intonation',text:'فقط لحن'},{value:'other',text:'روش دیگر'}
-        ])}
-        ${fieldArea('state3.questions.explain','توضیح مختصر')}
-        <div class="row2">${fieldText('state3.questions.statement','جملهٔ خبری')}${fieldText('state3.questions.question','جملهٔ پرسشی')}</div>
-      </div>`;
-  }
+از بین دسته‌بندی‌های زیر، حداقل ۱۵ مفهوم را که برای شنوندگان شما مهم یا پرکاربرد هستند انتخاب کرده و واژه معادل آن‌ها را در زبان خود بسازید. دلیل اهمیت هر واژه را نیز بنویسید.
 
-  const S3_RENDERERS = {
-    evidentiality:renderS3Evidentiality, order:renderS3Order, time:renderS3Time, number:renderS3Number, 
-    gender:renderS3Gender, negation:renderS3Negation, questions:renderS3Questions
-  };
-  function isS3SubFilled(id){ return deepFilled(STATE.state3[id]); }
-  function renderState3(sub){
-    const subNav = GRAMMAR_SUB.map(g=>`<div class="subnav-item ${g.id===sub?'active':''} ${isS3SubFilled(g.id)?'filled':''}" data-s3goto="${g.id}">${g.label}</div>`).join('');
-    return `<div class="subnav">${subNav}</div>` + S3_RENDERERS[sub]();
-  }
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\textwidth}{|c|X|X|X|}
+\hline
+\textbf{ردیف} & \textbf{مفهوم} & \textbf{واژه در زبان شما} & \textbf{دلیل اهمیت} \\ \hline
+۱ & & & \\ \hline
+۲ & & & \\ \hline
+۳ & & & \\ \hline
+۴ & & & \\ \hline
+۵ & & & \\ \hline
+۶ & & & \\ \hline
+۷ & & & \\ \hline
+۸ & & & \\ \hline
+۹ & & & \\ \hline
+۱۰ & & & \\ \hline
+۱۱ & & & \\ \hline
+۱۲ & & & \\ \hline
+۱۳ & & & \\ \hline
+۱۴ & & & \\ \hline
+۱۵ & & & \\ \hline
+\end{tabularx}
+\end{center}
 
-  function renderState4(){
-    const words = STATE.state4.words;
-    const categories = ['فرد/موجود مهم','پدیدهٔ طبیعی','یک عمل مهم','یک ویژگی (بزرگ/سریع)','مفهوم فرهنگی'];
-    const rows = words.map((w,i)=>`
-      <div class="word-row">
-        <div class="idx">واژه ${i+1} (${categories[i%5]})</div>
-        <input type="text" data-field="state4.words.${i}.concept" value="${escapeHtml(w.concept)}" placeholder="مفهوم (فارسی)">
-        <input type="text" data-field="state4.words.${i}.word" value="${escapeHtml(w.word)}" placeholder="کلمه در زبان شما">
-        <input type="text" data-field="state4.words.${i}.reason" value="${escapeHtml(w.reason)}" placeholder="چرا این واژه مهم است؟">
-      </div>`).join('');
-    return `
-      <div class="guide">
-        <p><strong>گام چهارم: واژگان پایه</strong><br>حداقل ۱۵ مفهوم را از دسته‌بندی‌های زیر انتخاب کرده و برای آن‌ها واژه بسازید. دلیل اهمیت هر واژه را در فرهنگ شما بنویسید.</p>
-      </div>
-      <div class="card"><div class="wordgrid">${rows}</div></div>`;
-  }
+% =====================================================================
+\section*{گام پنجم: ساخت کلمات جدید}
+در گام سوم مشخص کردید که زبان شما چگونه تفاوت‌هایی مثل مفرد/جمع، جنسیت‌ها یا منفی/مثبت را نشان می‌دهد. اکنون باید دقیقاً مشخص کنید این تفاوت‌ها چگونه در شکل کلمات ظاهر می‌شوند. برای هر مورد، از واژگان پایه‌ای که در گام چهارم ساختید استفاده کنید.
 
-  function renderState5(){
-    const s5 = STATE.state5;
-    return `
-      <div class="guide">
-        <p><strong>گام پنجم: ساخت واژه جدید</strong><br>نشان دهید که چگونه با استفاده از قوانین زبان، از واژگان پایه، واژگان جدید یا شکل‌های مختلف می‌سازید.</p>
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;">۱. تعداد (مفرد به جمع)</div>
-        <div class="row3">
-          ${fieldText('state5.number.base','واژه مفرد')}
-          ${fieldText('state5.number.plural','شکل جمع')}
-        </div>
-        ${fieldArea('state5.number.rule','قاعدهٔ ساخت جمع چیست؟')}
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;">۲. دسته‌بندی / جنسیت</div>
-        <div class="row3">
-          ${fieldText('state5.gender.base','شکل اولیه')}
-          ${fieldText('state5.gender.form2','شکل برای دسته/جنسیت دیگر')}
-        </div>
-        ${fieldArea('state5.gender.rule','قاعدهٔ تغییر چیست؟')}
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;">۳. منفی‌سازی واژه</div>
-        <div class="row3">
-          ${fieldText('state5.negation.base','واژه مثبت (مثلاً: دیدن)')}
-          ${fieldText('state5.negation.negative','واژه منفی (مثلاً: ندیدن/کور)')}
-        </div>
-        ${fieldArea('state5.negation.rule','قاعدهٔ ساخت شکل منفی چیست؟')}
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;">۴. واژگان مرتبط (اشتقاق)</div>
-        <div class="row3">
-          ${fieldText('state5.derivation.base','واژه پایه (مثلاً: کار)')}
-          ${fieldText('state5.derivation.derived','واژه مشتق‌شده (مثلاً: کارگاه)')}
-          ${fieldText('state5.derivation.meaning','معنای واژه مشتق‌شده')}
-        </div>
-        ${fieldArea('state5.derivation.rule','قاعدهٔ ساخت واژه مرتبط چیست؟')}
-      </div>`;
-  }
+\subsection*{۱. تعداد}
+اگر زبان شما بین مفرد و جمع تفاوت قائل است، آن را نشان دهید.
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{0.8\textwidth}{|X|X|X|}
+\hline
+\textbf{معنا} & \textbf{مفرد} & \textbf{جمع} \\ \hline
+& & \\ \hline
+& & \\ \hline
+& & \\ \hline
+& & \\ \hline
+\end{tabularx}
+\end{center}
+\textbf{قاعده‌ای که برای ساخت جمع از آن استفاده می‌کنید:}
+\writelines{2}
 
-  function renderState6(){
-    const s6 = STATE.state6;
-    return `
-      <div class="guide">
-        <p><strong>گام ششم: آزمون زبان</strong><br>آیا زبان شما واقعاً کار می‌کند؟ جملات زیر را با استفاده از قوانین و واژگانی که ساخته‌اید به زبان خود ترجمه کنید. اگر با کمبود واژه یا قاعده مواجه شدید، به گام‌های قبل برگردید و آن را اصلاح کنید.</p>
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;">۱. جملهٔ ساده</div>
-        <p class="hint" style="margin-bottom:10px;">«[مهم دﺮﻓ/دﻮﺟﻮﻣ ﮏﯾ] [ﺎﻤﺷ یﺎﯿﻧد رد ﻢﻬﻣ رﺎﮐ ﮏﯾ] ﺪﻨﮐ ﯽﻣ»</p>
-        <div class="row2">
-          ${fieldText('state6.simpleFa','ترجمه به زبان شما')}
-          ${fieldArea('state6.simple','توضیح کوتاه دربارهٔ رعایت قوانین در این جمله')}
-        </div>
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;">۲. زمان و تعداد</div>
-        <p class="hint" style="margin-bottom:10px;">«[ﻢﻬﻣ دﻮﺟﻮﻣ ﺪﻨﭼ/ود] [رﺎﮐ نآ] [ﺺﺨﺸﻣ نﺎﻣز ﮏﯾ رد] ﺪﻧداد مﺎﺠﻧا»</p>
-        <div class="row2">
-          ${fieldText('state6.timeNumFa','ترجمه به زبان شما')}
-          ${fieldArea('state6.timeNum','توضیح کوتاه دربارهٔ رعایت قوانین در این جمله')}
-        </div>
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;">۳. منفی</div>
-        <p class="hint" style="margin-bottom:10px;">«[داﺮﻓا/دﻮﺟﻮﻣ نآ] [رﺎﮐ نآ] ﺪﻧداﺪﻧ مﺎﺠﻧا»</p>
-        <div class="row2">
-          ${fieldText('state6.negativeFa','ترجمه به زبان شما')}
-          ${fieldArea('state6.negative','توضیح کوتاه دربارهٔ رعایت قوانین در این جمله')}
-        </div>
-      </div>
-      <div class="card">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;">۴. پرسشی</div>
-        <p class="hint" style="margin-bottom:10px;">«ﺎﯾآ [دﻮﺟﻮﻣ نآ] [ار رﺎﮐ نآ] ﺖﺳا هداد مﺎﺠﻧا؟»</p>
-        <div class="row2">
-          ${fieldText('state6.questionFa','ترجمه به زبان شما')}
-          ${fieldArea('state6.question','توضیح کوتاه دربارهٔ رعایت قوانین در این جمله')}
-        </div>
-      </div>
-      <div class="card" style="border-color:var(--gold);">
-        <div class="section-title" style="font-size:16px;margin-bottom:12px;color:var(--gold);">۵. پیام برای غرفهٔ رستا</div>
-        <p class="hint" style="margin-bottom:10px;">«مﻼﺳ ﺮﺘﻔﮐ ﺎﺘﺳر! ﺎﻣ هوﺮﮔ ﮏﯾ ﺪﯾﺪﺟ رازﺎﺑ رد ﻢﯿﺘﺴﻫ و ﻦﯾا نﺎﺑز ﺎﻣ ﺖﺳا.»</p>
-        <div class="row2">
-          ${fieldText('state6.rastaMsgFa','ترجمه به زبان شما')}
-          ${fieldArea('state6.rastaMsg','توضیح کوتاه دربارهٔ رعایت قوانین در این جمله')}
-        </div>
-      </div>`;
-  }
+\subsection*{۲. دسته‌بندی یا جنسیت}
+اگر زبان شما بین دسته‌ها یا جنسیت‌های مختلف تفاوت قائل است، آن را نشان دهید.
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{0.8\textwidth}{|X|X|X|}
+\hline
+\textbf{مفهوم} & \textbf{شکل اول} & \textbf{شکل دوم} \\ \hline
+& & \\ \hline
+& & \\ \hline
+& & \\ \hline
+& & \\ \hline
+\end{tabularx}
+\end{center}
+\textbf{قاعده‌ای که برای نشان دادن این تفاوت از آن استفاده می‌کنید:}
+\writelines{2}
 
-  function renderAdvanced(){
-    const adv = STATE.advanced;
-    const isCal = adv.choice === 'calendar';
-    const isCount = adv.choice === 'counting';
-    
-    let calHtml = '';
-    if(isCal){
-      calHtml = `
-        <div class="guide"><p><strong>چالش اول: شمای بدون تقویم!</strong><br>مردم شما باید دربارهٔ زمان‌های مختلف صحبت کنند، اما تقویمی ندارند. سیستم میوقت و نامز خود را طراحی کنید.</p></div>
-        <div class="card">
-          ${fieldText('advanced.calendar.dayDef','یک «روز» را چگونه تعریف می‌کنید؟')}
-          ${fieldText('advanced.calendar.monthDef','یک «ماه» را چگونه تعریف می‌کنید؟')}
-          ${fieldText('advanced.calendar.yearDef','یک «سال» را چگونه تعریف می‌کنید؟')}
-          ${fieldArea('advanced.calendar.basis','مبنای اندازه‌گیری زمان شما چیست؟ (حرکت خورشید، ماه، فصل‌ها، یا پدیده‌ای خاص در دنیای شما؟)')}
-          ${fieldText('advanced.calendar.yearLength','سال شما چند روز/واحد است؟')}
-          ${fieldArea('advanced.calendar.extraDays','اگر تعداد روزها به‌طور دقیق تقسیم نمی‌شود، با روزهای اضافه چه می‌کنید؟')}
-          ${fieldArea('advanced.calendar.monthNames','نام ماه‌های تقویم خود را بنویسید و بگویید بر چه اساسی نام‌گذاری شده‌اند (تاریخی، طبیعی، مذهبی).')}
-          ${fieldArea('advanced.calendar.festivals','آیا جشن‌های خاصی در آغاز/پایان سال یا فصل‌ها دارید؟ توضیح دهید.')}
-        </div>`;
-    }
+\subsection*{۳. ساخت شکل منفی}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{0.8\textwidth}{|X|X|X|}
+\hline
+\textbf{مفهوم مثبت} & \textbf{شکل مثبت} & \textbf{شکل منفی} \\ \hline
+& & \\ \hline
+& & \\ \hline
+& & \\ \hline
+& & \\ \hline
+\end{tabularx}
+\end{center}
+\textbf{قاعده‌ای که برای ساخت شکل منفی از آن استفاده می‌کنید:}
+\writelines{2}
 
-    let countHtml = '';
-    if(isCount){
-      countHtml = `
-        <div class="guide"><p><strong>چالش دوم: شمارش بدون عدد!</strong><br>مردم شما برای تجارت و زندگی روزمره به شمارش نیاز دارند، اما سیستم عددی ندارند.</p></div>
-        <div class="card">
-          ${fieldArea('advanced.counting.noNumberMethod','۱. فرض کنید هیچ عددی ندارید. چگونه می‌توانید مقدار چند دسته کالا را به فروشنده نشان دهید و بگویید کدام بیشتر است؟ (بدون استفاده از اعداد ۱، ۲، ۳...)')}
-          ${fieldArea('advanced.counting.grouping','۲. آیا اشیاء را گروه‌بندی می‌کنید؟ (مثلاً دسته‌های ۵ تایی یا ۱۰ تایی). چرا این گروه‌بندی را انتخاب کردید؟')}
-          ${fieldArea('advanced.counting.base','۳. پایهٔ سیستم شمارش شما چیست؟ (مثلاً ۵، ۱۰، ۲۰، یا عددی دیگر بر اساس آناتومی بدن یا محیط)')}
-        </div>
-        <div class="card">
-          <div class="section-title" style="font-size:16px;margin-bottom:12px;">۴. طراحی نمادها</div>
-          <p class="hint">برای مقادیر پایه (مثلاً ۱ تا ۵ یا ۱۰) نماد طراحی کنید.</p>
-          <div class="row3">
-            ${fieldText('advanced.counting.symbols.0','نماد ۱')}
-            ${fieldText('advanced.counting.symbols.1','نماد ۲')}
-            ${fieldText('advanced.counting.symbols.2','نماد ۳')}
-            ${fieldText('advanced.counting.symbols.3','نماد ۴')}
-            ${fieldText('advanced.counting.symbols.4','نماد ۵')}
-          </div>
-          ${fieldArea('advanced.counting.combineRule','۵. وقتی نمادها کنار هم قرار می‌گیرند چه اتفاقی می‌افتد؟ (آیا جمع می‌شوند؟ آیا جایگاه آن‌ها ارزش را تغییر می‌دهد؟)')}
-          ${fieldArea('advanced.counting.zeroExplain','۶. اگر هیچ چیزی نداشته باشیم (مثلاً انبار خالی)، چگونه آن را نشان می‌دهید؟ آیا نماد «صفر» دارید؟')}
-        </div>
-        <div class="card">
-          <div class="section-title" style="font-size:16px;margin-bottom:12px;">۷. حل مسائل با سیستم خودتان</div>
-          ${fieldText('advanced.counting.math1','مسئله ۱: تاجری ۷ کالا دارد و ۳ کالای دیگر دریافت می‌کند. (نحوه نمایش و پاسخ)')}
-          ${fieldText('advanced.counting.math2','مسئله ۲: از یک گروه ۲۰ نفره، ۱۲ نفر جدا می‌شوند. (نحوه نمایش و پاسخ)')}
-          ${fieldArea('advanced.counting.math3','مسئله ۳: چگونه نشان می‌دهید که یک مقدار از مقدار دیگر بزرگ‌تر است؟')}
-        </div>`;
-    }
+\subsection*{۴. ساخت کلمات مرتبط (اشتقاق)}
+با استفاده از واژگان پایه، کلمات جدیدی بسازید (مثلاً از واژه «کار»، واژه «کارگاه» یا «ابزار کار» را بسازید).
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{0.8\textwidth}{|X|X|X|}
+\hline
+\textbf{واژه پایه} & \textbf{معنای جدید} & \textbf{واژه جدید} \\ \hline
+& & \\ \hline
+& & \\ \hline
+& & \\ \hline
+& & \\ \hline
+\end{tabularx}
+\end{center}
 
-    return `
-      <div class="guide">
-        <p><strong>گام پیشرفته: ندمت و زبان</strong><br>زبان جدا از فرهنگ و محیط نیست. یکی از دو چالش زیر را انتخاب کنید و نشان دهید چگونه محیط و فرهنگ شما روی سیستم نامز یا شمارش اثر می‌گذارد.</p>
-      </div>
-      <div class="card">
-        ${toggleGroup('advanced.choice','کدام چالش را انتخاب می‌کنید؟', [
-          {value:'calendar', text:'چالش ۱: طراحی تقویم (ندمت بدون میوقت)'},
-          {value:'counting', text:'چالش ۲: طراحی سیستم شمارش (ندمت بدون عدد)'}
-        ])}
-      </div>
-      ${calHtml}
-      ${countHtml}`;
-  }
+% =====================================================================
+\newpage
+\section*{گام ششم: آیا زبان شما واقعاً کار می‌کند؟}
+تا اینجا صدای زبان، قوانین جمله‌سازی و تعدادی واژه ساخته‌اید. اکنون وقت آن است که زبان خود را آزمایش کنید. جملات زیر را که تا به حال در زبان شما وجود نداشته‌اند، با استفاده از قوانین و واژگانی که ساخته‌اید ترجمه کنید. 
 
-  function deepFilled(v){
-    if(Array.isArray(v)) return v.some(deepFilled);
-    if(v && typeof v==='object') return Object.values(v).some(deepFilled);
-    if(typeof v==='boolean') return v;
-    return v!=null && String(v).trim().length>0;
-  }
+\textbf{نکته مهم:} اگر برای ترجمه جمله‌ای متوجه شدید که واژه یا قانونی در زبان شما وجود ندارد، به عقب برگردید و آن را به زبان خود اضافه کنید. این دقیقاً بخشی از فرآیند زبان‌سازی است!
 
-  function renderSummary(){
-    const s = STATE;
-    let html = `<div class="summary-card" id="summaryText">`;
+\subsection*{۱. یک جمله ساده}
+جمله زیر را با انتخاب یک موجود/فرد مهم و یک کار مهم در دنیای خود ترجمه کنید:
+\begin{center}
+\colorbox{RastaPale}{\parbox{0.9\textwidth}{«[یک فرد/موجود مهم] [یک کار مهم در دنیای شما] می‌کند.»}}
+\end{center}
+\textbf{ترجمه شما:}
+\writelines{2}
+\textbf{توضیح کوتاه درباره رعایت قوانین زبان در این جمله:}
+\writelines{2}
 
-    html += `<h3>گام ۱: دنیای زبان</h3>`;
-    html += deepFilled(s.state1) ? `<p>گویشوران: ${escapeHtml(s.state1.beings||'—')}<br>مکان/زمان: ${escapeHtml(s.state1.place||'—')}<br>باورها: ${escapeHtml(s.state1.beliefs||'—')}</p>` : `<p class="empty">تکمیل نشده</p>`;
+\subsection*{۲. زمان و تعداد}
+حالا همان موقعیت را کمی پیچیده‌تر کنید:
+\begin{center}
+\colorbox{RastaPale}{\parbox{0.9\textwidth}{«[دو/چند موجود مهم] [آن کار] را [در یک زمان مشخص] انجام دادند.»}}
+\end{center}
+\textbf{ترجمه شما:}
+\writelines{2}
+\textbf{توضیح کوتاه درباره رعایت قوانین زبان در این جمله:}
+\writelines{2}
 
-    html += `<h3>گام ۲: آوا و خط</h3>`;
-    html += deepFilled(s.state2) ? `<p>حس زبان: ${escapeHtml(s.state2.sense||'—')}<br>آواها/نشانه‌ها: ${escapeHtml(s.state2.sounds||'—')}</p>` : `<p class="empty">تکمیل نشده</p>`;
+\subsection*{۳. منفی}
+حالا همان موقعیت را منفی کنید:
+\begin{center}
+\colorbox{RastaPale}{\parbox{0.9\textwidth}{«[آن افراد/موجود] [آن کار] را انجام ندادند.»}}
+\end{center}
+\textbf{ترجمه شما:}
+\writelines{2}
+\textbf{توضیح کوتاه درباره رعایت قوانین زبان در این جمله:}
+\writelines{2}
 
-    html += `<h3>گام ۳: ساختار جمله</h3>`;
-    const orderLabel = {SOV:'فاعل–مفعول–فعل',SVO:'فاعل–فعل–مفعول',OSV:'مفعول–فاعل–فعل',OVS:'مفعول–فعل–فاعل',VSO:'فعل–فاعل–مفعول',VOS:'فعل–مفعول–فاعل',other:s.state3.order.customOrder}[s.state3.order.order];
-    html += `<p>ترتیب جمله: ${escapeHtml(orderLabel||'مشخص نشده')}</p>`;
-    if(s.state3.time.sys.length) html += `<p>تمایز زمانی: ${escapeHtml(s.state3.time.sys.join('، '))}</p>`;
+\subsection*{۴. یک پرسش}
+یکی از جملات قبلی را به پرسش تبدیل کنید:
+\begin{center}
+\colorbox{RastaPale}{\parbox{0.9\textwidth}{«آیا [آن موجود] [آن کار] را انجام داده است؟»}}
+\end{center}
+\textbf{ترجمه شما:}
+\writelines{2}
+\textbf{توضیح کوتاه درباره رعایت قوانین زبان در این جمله:}
+\writelines{2}
 
-    html += `<h3>گام ۴: واژگان پایه</h3>`;
-    const filledWords = s.state4.words.filter(w=>w.concept||w.word);
-    html += filledWords.length ? `<p>${filledWords.map(w=>escapeHtml((w.concept||'؟')+' = '+(w.word||'؟'))).join(' · ')}</p>` : `<p class="empty">تکمیل نشده</p>`;
+\subsection*{۵. آزمون نهایی: پیامی برای غرفه رستا}
+زبان شما اکنون کامل شده است. شما آماده‌اید تا خود را به عنوان یک گروه جدید و مستقل در بازار معرفی کنید. پیام زیر را با استفاده از تمام قوانین و واژگانی که ساخته‌اید ترجمه کنید. (اگر نیاز به واژه یا قانون جدیدی دارید، همین حالا آن را بسازید و به بخش‌های قبلی اضافه کنید).
+\begin{center}
+\colorbox{RastaPale}{\parbox{0.9\textwidth}{«سلام غرفه رستا! ما یک گروه جدید در بازار هستیم و این زبان ما است.»}}
+\end{center}
+\textbf{ترجمه شما:}
+\writelines{2}
+\textbf{توضیح کوتاه درباره رعایت قوانین زبان در این جمله:}
+\writelines{2}
 
-    html += `<h3>گام ۵: ساخت واژه جدید</h3>`;
-    html += `<p>جمع: ${escapeHtml(s.state5.number.base||'—')} ← ${escapeHtml(s.state5.number.plural||'—')}</p>`;
-    html += `<p>منفی: ${escapeHtml(s.state5.negation.base||'—')} ← ${escapeHtml(s.state5.negation.negative||'—')}</p>`;
+% =====================================================================
+\newpage
+\section*{یک قدم فراتر: زبان و تمدن}
+تا اینجا شما بر اساس دنیای شنوندگان خود، صداها، قوانین و واژگان زبان‌تان را طراحی کردید. اما زبان جدا از فرهنگ و شیوه زندگی یک جامعه نیست. چگونه نگاه آن‌ها به جهان در زبان‌شان بازتاب پیدا می‌کند؟
 
-    html += `<h3>گام ۶: آزمون زبان</h3>`;
-    html += deepFilled(s.state6) ? `<p>پیام به رستا: ${escapeHtml(s.state6.rastaMsgFa||'—')}</p>` : `<p class="empty">تکمیل نشده</p>`;
+در این بخش، \textbf{فقط یکی} از دو چالش زیر را انتخاب کرده و تا انتها انجام دهید. (انجام هر دو الزامی نیست).
 
-    html += `<h3>گام پیشرفته</h3>`;
-    html += `<p>چالش انتخاب‌شده: ${s.advanced.choice==='calendar'?'تقویم':(s.advanced.choice==='counting'?'شمارش':'انتخاب نشده')}</p>`;
+\subsection*{چالش اول: تمدن شما تقویم ندارد!}
+مردم تمدن شما باید بتوانند درباره زمان‌های مختلف صحبت کنند، رویدادهای مهم را به یاد بیاورند و فصل‌ها را بشناسند، اما هنوز تقویمی ندارند. با توجه به فرهنگ، محیط زندگی و شیوه زندگی تمدن خود، سیستم زمان‌سنجی و تقویم آن را طراحی کنید.
+\begin{itemize}
+    \item \textbf{مبنای تقویم شما چیست؟} (حرکت خورشید، ماه، فصل‌ها، یا یک پدیده خاص در دنیای شما؟ چرا این را انتخاب کردید؟)
+    \writelines{2}
+    \item \textbf{تعریف واحدها:} یک «روز»، یک «ماه» و یک «سال» را چگونه تعریف می‌کنید؟
+    \writelines{2}
+    \item \textbf{طول سال:} سال شما چند روز است؟ (می‌تواند بر اساس یک چرخه طبیعی نزدیک به ۳۶۵ روز باشد یا یک عدد نمادین و دلخواه). چند ماه دارید و هر ماه چند روز است؟ اگر تعداد روزها دقیقاً تقسیم نمی‌شود، با روزهای اضافه چه می‌کنید؟
+    \writelines{3}
+    \item \textbf{نام‌گذاری ماه‌ها:} نام ماه‌های تقویم خود را بنویسید و توضیح دهید بر چه اساسی نام‌گذاری شده‌اند (تاریخی، طبیعی، مذهبی و...).
+    \writelines{3}
+    \item \textbf{جشن‌ها:} آیا جشن‌های خاصی در آغاز یا پایان سال یا فصل‌ها دارید؟ توضیح دهید.
+    \writelines{2}
+\end{itemize}
 
-    html += `<button class="copy-btn" id="copySummary">کپی کردن خلاصه</button></div>`;
-    return html;
-  }
+\subsection*{چالش دوم: تمدن شما عدد ندارد!}
+مردم تمدن شما برای تجارت و زندگی روزمره به شمارش نیاز دارند (تعداد کالاها، فواصل، تعداد افراد و...)، اما هنوز سیستم عددی ندارند. با توجه به فرهنگ و نیازهای تمدن خود، یک سیستم شمارش از پایه طراحی کنید.
+\begin{itemize}
+    \item \textbf{شمارش بدون عدد:} فرض کنید هیچ عددی ندارید. چگونه می‌توانید مقدار چند دسته کالا را به فروشنده نشان دهید و بگویید کدام بیشتر است؟ (بدون استفاده از اعداد ۱، ۲، ۳... و با استفاده از روش‌هایی مثل دسته‌بندی، خط کشیدن، چیدن و...). آیا این روش برای تعداد بالا (مثلاً ۲۰۰) هم کارآمد است؟
+    \writelines{3}
+    \item \textbf{مبنای شمارش:} آیا اشیاء را گروه‌بندی می‌کنید؟ (مثلاً دسته‌های ۵ تایی یا ۱۰ تایی). مبنای سیستم شمارش شما چیست و چرا این مبنای خاص را (مثلاً بر اساس آناتومی بدن یا محیط) انتخاب کردید؟
+    \writelines{3}
+    \item \textbf{طراحی نمادها:} برای مقادیر پایه (مثلاً ۱ تا ۵ یا ۱۰) نماد طراحی کنید.
+    \writelines{3}
+    \item \textbf{قاعده ترکیب:} وقتی نمادها کنار هم قرار می‌گیرند چه اتفاقی می‌افتد؟ (آیا فقط جمع می‌شوند؟ آیا جایگاه آن‌ها ارزش را تغییر می‌دهد؟). قانون ترکیب نمادهای خود را توضیح دهید.
+    \writelines{3}
+    \item \textbf{مفهوم صفر:} اگر هیچ چیزی نداشته باشیم (مثلاً انبار کاملاً خالی است)، چگونه آن را نشان می‌دهید؟ آیا نماد مستقلی برای «صفر» یا «هیچ» دارید؟ توضیح دهید.
+    \writelines{2}
+    \item \textbf{حل مسائل با سیستم خودتان:} 
+    \begin{enumerate}
+        \item تاجری ۷ کالا دارد و ۳ کالای دیگر دریافت می‌کند. (نحوه نمایش و پاسخ را بنویسید)
+        \item از یک گروه ۲۰ نفره، ۱۲ نفر جدا می‌شوند. (نحوه نمایش و پاسخ را بنویسید)
+        \item چگونه نشان می‌دهید که یک مقدار از مقدار دیگر بزرگ‌تر است؟
+    \end{enumerate}
+    \writelines{4}
+\end{itemize}
 
-  function topLabel(id){ return TOP.find(t=>t.id===id); }
-  function isTopFilled(id){
-    if(id==='summary' || id==='intro') return false;
-    return deepFilled(STATE[id]);
-  }
-  function overallProgress(){
-    const real = TOP.filter(t=>t.id!=='summary' && t.id!=='intro');
-    const filled = real.filter(t=>isTopFilled(t.id)).length;
-    return Math.round((filled/real.length)*100);
-  }
-  function toFaDigits(n){
-    const map={'0':'۰','1':'۱','2':'۲','3':'۳','4':'۴','5':'۵','6':'۶','7':'۷','8':'۸','9':'۹'};
-    return String(n).replace(/[0-9]/g,d=>map[d]);
-  }
-
-  function renderRail(){
-    const cur = FLOW[flowIndex];
-    const rail = document.getElementById('rail');
-    rail.innerHTML = TOP.map(t=>`
-      <div class="rail-item ${t.id===cur.top?'active':''} ${isTopFilled(t.id)?'filled':''}" data-goto="${t.id}">
-        <span class="rail-num">${t.num}</span><span>${t.label}</span>
-      </div>`).join('');
-    rail.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click', ()=>gotoTop(el.dataset.goto)));
-
-    const tabs = document.getElementById('mobileTabs');
-    tabs.innerHTML = TOP.map(t=>`<div class="mobile-tab ${t.id===cur.top?'active':''}" data-goto="${t.id}">${t.num}. ${t.label}</div>`).join('');
-    tabs.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click', ()=>gotoTop(el.dataset.goto)));
-  }
-  function gotoTop(id){
-    const i = FLOW.findIndex(f=>f.top===id);
-    flowIndex = i>=0?i:0;
-    renderAll();
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-  function updateProgress(){
-    const pct = overallProgress();
-    document.getElementById('progressFill').style.width = pct+'%';
-    document.getElementById('progressLabel').textContent = toFaDigits(pct)+'٪';
-  }
-
-  const TOP_RENDERERS = {
-    intro:renderIntro, state1:renderState1, state2:renderState2, 
-    state4:renderState4, state5:renderState5, state6:renderState6, 
-    advanced:renderAdvanced, summary:renderSummary
-  };
-
-  function renderStage(){
-    const cur = FLOW[flowIndex];
-    const meta = topLabel(cur.top);
-    const stage = document.getElementById('stage');
-    let bodyHtml;
-    if(cur.top==='state3'){
-      bodyHtml = renderState3(cur.sub);
-    } else {
-      bodyHtml = TOP_RENDERERS[cur.top]();
-    }
-    const posLabel = `مرحلهٔ ${toFaDigits(flowIndex+1)} از ${toFaDigits(FLOW.length)}`;
-    stage.innerHTML = `
-      <div class="section-head">
-        <div class="section-eyebrow">${posLabel}</div>
-        <h2 class="section-title">${meta.label}${cur.sub?' — '+GRAMMAR_SUB.find(g=>g.id===cur.sub).label:''}</h2>
-      </div>
-      ${bodyHtml}
-      <div class="nav-buttons">
-        <button class="nav-btn" id="prevBtn" ${flowIndex===0?'disabled':''}>→ قبلی</button>
-        <button class="nav-btn primary" id="nextBtn" ${flowIndex===FLOW.length-1?'disabled':''}>${flowIndex===FLOW.length-1?'پایان':'بعدی ←'}</button>
-      </div>`;
-    wireStage(stage);
-  }
-
-  function wireStage(stage){
-    stage.querySelectorAll('input[data-field], textarea[data-field]').forEach(el=>{
-      el.addEventListener('input', ()=>{
-        setPath(STATE, el.dataset.field, el.value);
-        saveDebounced(); updateProgress(); renderRail();
-      });
-    });
-    stage.querySelectorAll('[data-toggle]').forEach(el=>{
-      el.addEventListener('click', ()=>{
-        const path = el.dataset.toggle, val = el.dataset.value;
-        const curVal = getPath(STATE, path);
-        setPath(STATE, path, curVal===val ? '' : val);
-        saveDebounced(); renderStage(); updateProgress(); renderRail();
-      });
-    });
-    stage.querySelectorAll('[data-multitoggle]').forEach(el=>{
-      el.addEventListener('click', ()=>{
-        const path = el.dataset.multitoggle, val = el.dataset.value;
-        const arr = getPath(STATE, path);
-        const i = arr.indexOf(val);
-        if(i===-1) arr.push(val); else arr.splice(i,1);
-        saveDebounced(); renderStage(); updateProgress(); renderRail();
-      });
-    });
-    stage.querySelectorAll('[data-check]').forEach(el=>{
-      el.addEventListener('click', ()=>{
-        const path = el.dataset.check;
-        setPath(STATE, path, !getPath(STATE, path));
-        saveDebounced(); renderStage(); updateProgress(); renderRail();
-      });
-    });
-    stage.querySelectorAll('[data-s3goto]').forEach(el=>{
-      el.addEventListener('click', ()=>{
-        const idx = FLOW.findIndex(f=>f.top==='state3' && f.sub===el.dataset.s3goto);
-        if(idx>=0){ flowIndex = idx; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
-      });
-    });
-    const prev = document.getElementById('prevBtn');
-    const next = document.getElementById('nextBtn');
-    if(prev) prev.addEventListener('click', ()=>{ if(flowIndex>0){ flowIndex--; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); } });
-    if(next) next.addEventListener('click', ()=>{ if(flowIndex<FLOW.length-1){ flowIndex++; renderAll(); window.scrollTo({top:0,behavior:'smooth'}); } });
-
-    const copyBtn = document.getElementById('copySummary');
-    if(copyBtn){
-      copyBtn.addEventListener('click', async ()=>{
-        const text = document.getElementById('summaryText').innerText;
-        try{ await navigator.clipboard.writeText(text); copyBtn.textContent='کپی شد ✓'; setTimeout(()=>copyBtn.textContent='کپی کردن خلاصه',1400); }
-        catch(e){ copyBtn.textContent='کپی نشد'; }
-      });
-    }
-  }
-
-  function renderAll(){ renderRail(); renderStage(); updateProgress(); }
-
-  document.getElementById('resetBtn').addEventListener('click', async ()=>{
-    if(!confirm('همهٔ پاسخ‌های این کارگاه پاک شود؟ این کار قابل بازگشت نیست.')) return;
-    STATE = defaultState();
-    try{ await window.storage.delete(STORAGE_KEY, false); }catch(e){}
-    flowIndex = 0;
-    renderAll();
-  });
-
-  (async function init(){
-    await load();
-    renderAll();
-  })();
-
-})();
-</script>
-</body>
-</html>
+\end{document}
